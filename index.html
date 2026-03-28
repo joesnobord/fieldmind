@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FieldMind — HVAC AI Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2335;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --accent: #00d4ff;
+    --accent2: #0099bb;
+    --warn: #ff6b35;
+    --good: #00c896;
+    --text: #e8eaf0;
+    --muted: #7a8099;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'Inter', sans-serif;
+    --display: 'Syne', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  .logo {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); display: inline-block; }
+  .beta-badge {
+    font-size: 10px;
+    font-family: var(--mono);
+    background: rgba(0,212,255,0.12);
+    color: var(--accent);
+    border: 1px solid rgba(0,212,255,0.25);
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+  }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .api-status {
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--good); }
+
+  /* Mode tabs */
+  .mode-bar {
+    display: flex;
+    gap: 2px;
+    padding: 10px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    flex-shrink: 0;
+  }
+  .mode-tab {
+    font-family: var(--display);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 7px 16px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background: transparent;
+    color: var(--muted);
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .mode-tab:hover { color: var(--text); background: var(--surface2); }
+  .mode-tab.active { background: var(--accent); color: #000; }
+
+  /* Main layout */
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    height: calc(100vh - 106px);
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 280px;
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+  .sidebar-section { padding: 16px; border-bottom: 1px solid var(--border); }
+  .sidebar-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .quick-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 12px;
+    padding: 9px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 6px;
+    transition: all 0.15s;
+    line-height: 1.4;
+  }
+  .quick-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .quick-btn .qb-icon { font-size: 14px; margin-right: 6px; }
+
+  select, input[type="text"], input[type="number"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    outline: none;
+    margin-bottom: 4px;
+    appearance: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  select:focus, input:focus { border-color: var(--accent); }
+  label { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+
+  /* Priority field system */
+  .field-group { margin-bottom: 10px; }
+  .priority-badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .p-critical .priority-badge { background: rgba(255,107,53,0.2); color: var(--warn); border: 1px solid rgba(255,107,53,0.35); }
+  .p-important .priority-badge { background: rgba(255,193,7,0.15); color: #ffc107; border: 1px solid rgba(255,193,7,0.3); }
+  .p-optional .priority-badge { background: rgba(122,128,153,0.15); color: var(--muted); border: 1px solid rgba(122,128,153,0.2); }
+
+  .p-critical select, .p-critical input { border-color: rgba(255,107,53,0.45); }
+  .p-critical select:focus, .p-critical input:focus { border-color: var(--warn); box-shadow: 0 0 0 2px rgba(255,107,53,0.12); }
+  .p-important select, .p-important input { border-color: rgba(255,193,7,0.35); }
+  .p-important select:focus, .p-important input:focus { border-color: #ffc107; box-shadow: 0 0 0 2px rgba(255,193,7,0.1); }
+  .p-optional select, .p-optional input { border-color: var(--border); opacity: 0.7; }
+
+  .field-hint { font-size: 10px; color: var(--muted); font-style: italic; margin-bottom: 4px; line-height: 1.4; padding-left: 2px; }
+
+  .priority-legend {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 12px; padding: 8px 10px;
+    background: var(--surface2); border-radius: 6px; border: 1px solid var(--border);
+  }
+  .legend-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--muted); font-family: var(--mono); }
+  .legend-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .ld-critical { background: var(--warn); }
+  .ld-important { background: #ffc107; }
+  .ld-optional { background: var(--muted); }
+
+  .field-group.filled select, .field-group.filled input { border-color: rgba(0,200,150,0.45) !important; }
+
+  /* Frustration meter — full width bar above chat */
+  .frustration-bar {
+    flex-shrink: 0;
+    padding: 18px 28px 14px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.4s, border-color 0.4s;
+  }
+  .frustration-bar.fr-low  { background: rgba(0,200,150,0.06);  border-bottom-color: rgba(0,200,150,0.25); }
+  .frustration-bar.fr-mid  { background: rgba(255,193,7,0.06);   border-bottom-color: rgba(255,193,7,0.25); }
+  .frustration-bar.fr-high { background: rgba(255,107,53,0.08);  border-bottom-color: rgba(255,107,53,0.3); }
+  .frustration-bar.fr-max  { background: rgba(226,75,74,0.1);    border-bottom-color: rgba(226,75,74,0.4); }
+
+  .fr-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .fr-left { display: flex; align-items: center; gap: 10px; }
+  .fr-emoji-big {
+    font-size: 32px;
+    line-height: 1;
+    transition: all 0.2s;
+    filter: grayscale(0);
+  }
+  .fr-title-block {}
+  .fr-title {
+    font-family: var(--display);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.3px;
+  }
+  .fr-sublabel {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+    font-style: italic;
+    transition: color 0.2s;
+    min-height: 16px;
+  }
+  .fr-score {
+    font-family: var(--mono);
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1;
+    transition: color 0.3s;
+    min-width: 64px;
+    text-align: right;
+  }
+  .fr-score .fr-denom {
+    font-size: 18px;
+    opacity: 0.45;
+  }
+
+  .fr-track-wrap { position: relative; }
+  input[type="range"]#frustration {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(to right, #00c896 0%, #7ecf6a 25%, #ffc107 50%, #ff6b35 75%, #e24b4a 100%);
+    outline: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    appearance: none;
+    display: block;
+  }
+  input[type="range"]#frustration::-webkit-slider-thumb {
+    appearance: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--bg);
+    box-shadow: 0 0 0 3px currentColor, 0 2px 8px rgba(0,0,0,0.4);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  input[type="range"]#frustration::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+  }
+  input[type="range"]#frustration:active::-webkit-slider-thumb {
+    transform: scale(1.25);
+  }
+
+  .fr-tick-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 2px 0;
+  }
+  .fr-tick {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    opacity: 0.5;
+    width: 20px;
+    text-align: center;
+  }
+  .fr-tick.active { opacity: 1; font-weight: 600; }
+
+  /* Chat area */
+  .chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .message { display: flex; gap: 12px; max-width: 820px; }
+  .message.user { flex-direction: row-reverse; align-self: flex-end; }
+  .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    font-family: var(--mono);
+    font-weight: 500;
+  }
+  .avatar.ai { background: rgba(0,212,255,0.15); color: var(--accent); font-size: 11px; }
+  .avatar.user { background: rgba(255,107,53,0.15); color: var(--warn); font-size: 11px; }
+  .bubble {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 680px;
+  }
+  .bubble.user { background: var(--surface2); border-color: var(--border2); }
+  .bubble strong { color: var(--accent); font-weight: 500; }
+  .bubble .diagnosis-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin: 2px 3px 2px 0;
+  }
+  .tag-high { background: rgba(255,107,53,0.15); color: var(--warn); border: 1px solid rgba(255,107,53,0.3); }
+  .tag-med { background: rgba(255,193,7,0.12); color: #ffc107; border: 1px solid rgba(255,193,7,0.25); }
+  .tag-low { background: rgba(0,200,150,0.12); color: var(--good); border: 1px solid rgba(0,200,150,0.25); }
+  .bubble ul { padding-left: 18px; margin: 8px 0; }
+  .bubble li { margin-bottom: 4px; }
+  .bubble .section-head {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin: 12px 0 5px;
+  }
+  .typing {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 0;
+  }
+  .typing span {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: bounce 1.2s infinite;
+    opacity: 0.5;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%,60%,100% { transform: translateY(0); opacity: 0.5; }
+    30% { transform: translateY(-6px); opacity: 1; }
+  }
+
+  /* Input bar */
+  .input-bar {
+    border-top: 1px solid var(--border);
+    padding: 16px 24px;
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  .input-wrap {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 10px 14px;
+    transition: border-color 0.15s;
+  }
+  .input-wrap:focus-within { border-color: var(--accent); }
+  #userInput {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    min-height: 24px;
+    max-height: 140px;
+    line-height: 1.5;
+    padding: 0;
+    margin: 0;
+  }
+  #userInput::placeholder { color: var(--muted); }
+  .send-btn {
+    background: var(--accent);
+    border: none;
+    color: #000;
+    width: 34px;
+    height: 34px;
+    border-radius: 7px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s;
+    font-size: 16px;
+  }
+  .send-btn:hover { background: var(--accent2); }
+  .send-btn:disabled { background: var(--border2); cursor: not-allowed; color: var(--muted); }
+  .input-hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+    text-align: center;
+    font-family: var(--mono);
+  }
+
+  /* Welcome screen */
+  .welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 24px;
+    padding: 40px;
+    text-align: center;
+  }
+  .welcome-title {
+    font-family: var(--display);
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    color: var(--text);
+  }
+  .welcome-sub { font-size: 15px; color: var(--muted); max-width: 440px; line-height: 1.6; }
+  .welcome-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    max-width: 560px;
+    width: 100%;
+  }
+  .welcome-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .welcome-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .welcome-card .wc-icon { font-size: 20px; margin-bottom: 8px; }
+  .welcome-card .wc-title { font-family: var(--display); font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .welcome-card .wc-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  .sqft-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 4px;
+    transition: background 0.15s;
+    border: 1px solid transparent;
+  }
+  .sqft-row:hover { background: var(--surface); border-color: var(--border2); }
+  .sqft-row.selected { background: rgba(0,212,255,0.08); border-color: rgba(0,212,255,0.3); }
+  .sqft-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  /* How do I know helpers */
+  .how-to-know {
+    margin: 3px 0 6px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: transparent;
+    transition: border-color 0.15s;
+    cursor: pointer;
+  }
+  .how-to-know:hover { border-color: var(--accent); }
+  .htk-trigger {
+    display: block;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--accent);
+    letter-spacing: 0.5px;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .how-to-know:hover .htk-trigger { background: rgba(0,212,255,0.06); }
+  .htk-body {
+    display: none;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.65;
+    border-top: 1px solid var(--border);
+    background: var(--surface2);
+    cursor: default;
+  }
+  .htk-body strong { color: var(--text); font-weight: 500; }
+  .how-to-know.open .htk-trigger { background: rgba(0,212,255,0.06); }
+  .how-to-know.open .htk-body { display: block; }
+
+  /* Live panel */
+  .live-empty {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+    text-align: center;
+    padding: 12px 0;
+    line-height: 1.5;
+  }
+  .live-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    background: var(--surface2);
+    font-size: 12px;
+    line-height: 1.4;
+    border: 1px solid var(--border);
+  }
+  .live-item .li-icon {
+    font-size: 13px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .live-item .li-text { color: var(--text); }
+  .live-item .li-label { font-size: 10px; color: var(--muted); font-family: var(--mono); letter-spacing: 0.5px; display: block; margin-bottom: 1px; }
+
+  .suggestion-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    padding: 7px 8px;
+    border-radius: 6px;
+    margin-bottom: 5px;
+    font-size: 12px;
+    line-height: 1.4;
+    border: 1px dashed var(--border2);
+    background: transparent;
+    color: var(--muted);
+    transition: background 0.15s, border-color 0.15s;
+    cursor: default;
+  }
+  .suggestion-item:hover { background: var(--surface2); border-color: var(--accent); color: var(--text); }
+  .suggestion-item .si-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    margin-top: 4px;
+    opacity: 0.6;
+  }
+  .suggestion-item.si-warn .si-dot { background: #ffc107; }
+  .suggestion-item.si-tip .si-dot { background: var(--good); }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  #outdoorDetail {
+    border-left: 2px solid rgba(0,212,255,0.2);
+    padding-left: 10px;
+    margin-left: 2px;
+  }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0) rotate(0deg); }
+    20%      { transform: translateX(-4px) rotate(-8deg); }
+    40%      { transform: translateX(4px) rotate(8deg); }
+    60%      { transform: translateX(-3px) rotate(-5deg); }
+    80%      { transform: translateX(3px) rotate(5deg); }
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  /* Mobile */
+  @media (max-width: 640px) {
+    .sidebar { display: none; }
+    .welcome-grid { grid-template-columns: 1fr; }
+    .messages { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <span class="logo-dot"></span>
+    FieldMind
+  </div>
+  <div class="header-right">
+    <span class="beta-badge">BETA</span>
+    <span class="api-status"><span class="status-dot"></span>AI Ready</span>
+  </div>
+</header>
+
+<div id="apiKeyBar" style="background:#1a1f2e; border-bottom:1px solid rgba(255,107,53,0.3); padding:10px 24px; display:flex; align-items:center; gap:10px; flex-shrink:0; flex-wrap:wrap;">
+  <span style="font-family:var(--mono); font-size:11px; color:#ff6b35; letter-spacing:1px; white-space:nowrap;">API KEY</span>
+  <input type="text" id="apiKeyInput" placeholder="Paste your Anthropic API key here (sk-ant-...)" 
+    style="flex:1; min-width:200px; background:var(--surface2); border:1px solid rgba(255,107,53,0.4); color:var(--text); font-family:var(--mono); font-size:12px; padding:6px 10px; border-radius:6px; outline:none;"
+    oninput="checkApiKey(this.value)" onpaste="setTimeout(()=>checkApiKey(this.value),100)" onchange="checkApiKey(this.value)">
+  <button onclick="activateKey()" style="background:#ff6b35; border:none; color:#000; font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:0.5px; padding:6px 14px; border-radius:6px; cursor:pointer; white-space:nowrap; transition:background 0.15s;" onmouseover="this.style.background='#e55a25'" onmouseout="this.style.background='#ff6b35'">ACTIVATE</button>
+  <span id="apiKeyStatus" style="font-size:11px; font-family:var(--mono); color:var(--muted); white-space:nowrap;">Paste key → click Activate</span>
+  <a href="https://platform.anthropic.com/settings/keys" target="_blank" 
+    style="font-size:11px; font-family:var(--mono); color:var(--accent); text-decoration:none; white-space:nowrap; border:1px solid rgba(0,212,255,0.3); padding:4px 10px; border-radius:4px;">
+    Get free key ↗
+  </a>
+</div>
+
+<div class="mode-bar">
+  <button class="mode-tab active" onclick="setMode('diagnose', this)">Diagnostics</button>
+  <button class="mode-tab" onclick="setMode('size', this)">System Sizing</button>
+  <button class="mode-tab" onclick="setMode('install', this)">Installation</button>
+  <button class="mode-tab" onclick="setMode('estimate', this)">Job Estimating</button>
+  <button class="mode-tab" onclick="setMode('vent', this)">Tech Frustrations</button>
+</div>
+
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Tell us about your system</div>
+
+      <div class="priority-legend">
+        <div class="legend-item"><span class="legend-dot ld-critical"></span>Must have</div>
+        <div class="legend-item"><span class="legend-dot ld-important"></span>Very helpful</div>
+        <div class="legend-item"><span class="legend-dot ld-optional"></span>Optional</div>
+      </div>
+
+      <div class="field-group p-critical" id="fg-outdoor">
+        <label>
+          <span class="priority-badge">Must have</span>
+          Do you have an outdoor unit?
+        </label>
+        <select id="hasOutdoor" onchange="detectSystem(); markFilled(this); toggleOutdoorDetail(this.value)">
+          <option value="">Not sure / don't know</option>
+          <option value="yes">Yes — there's a unit outside</option>
+          <option value="no">No outdoor unit</option>
+        </select>
+        <div class="how-to-know" onclick="toggleHow('how-outdoor')">
+          <span class="htk-trigger">&#63; How do I know?</span>
+          <div class="htk-body" id="how-outdoor">
+            Walk outside and look along the exterior walls of your home — usually on the side or back. It's a metal box about the size of a mini-fridge with a fan on top or side, sitting on a concrete pad or mounted on the wall. If you live in an apartment, check your balcony or a utility closet. No luck? Check your electric panel for a breaker labeled "AC," "Heat Pump," or "Condenser."
+          </div>
+        </div>
+      </div>
+
+      <!-- Outdoor unit detail — only shown when user says yes to outdoor unit -->
+      <div id="outdoorDetail" style="display:none;">
+        <div class="field-group p-critical" id="fg-outdoor-running">
+          <label>
+            <span class="priority-badge">Must have</span>
+            Is the outdoor unit running right now?
+          </label>
+          <select id="outdoorRunning" onchange="markFilled(this); updateLivePanel()">
+            <option value="">Not sure</option>
+            <option value="yes — fan spinning and humming">Yes — fan is spinning and it's humming</option>
+            <option value="fan spinning but no hum from compressor">Fan spinning but no compressor hum</option>
+            <option value="no — completely off and silent">No — completely off and silent</option>
+            <option value="tries to start then shuts off">Tries to start then shuts off quickly</option>
+            <option value="making loud unusual noise">Running but making a loud/unusual noise</option>
+          </select>
+          <div class="how-to-know" onclick="toggleHow('how-running')">
+            <span class="htk-trigger">&#63; How do I know?</span>
+            <div class="htk-body" id="how-running">
+              <strong>Go stand next to the outdoor unit while the thermostat is calling for cooling or heat.</strong><br><br>
+              <strong>Fan spinning:</strong> Look at the top or side grille — you should see fan blades moving.<br><br>
+              <strong>Compressor hum:</strong> Put your hand near the unit (don't touch). A running compressor makes a low steady hum or vibration — louder than just the fan.<br><br>
+              <strong>Completely off:</strong> No movement, no sound, nothing. Could mean the unit tripped a breaker or safety switch.<br><br>
+              <strong>Short-cycling:</strong> Starts up, runs for less than a minute, then shuts off — over and over.
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group p-critical" id="fg-outdoor-condition">
+          <label>
+            <span class="priority-badge">Must have</span>
+            What does the outdoor unit look like?
+          </label>
+          <div style="display:flex; flex-direction:column; gap:5px; margin-bottom:4px;" id="outdoorConditionChecks">
+            <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text); cursor:pointer; margin:0;">
+              <input type="checkbox" value="coils are dirty or clogged with debris" onchange="updateLivePanel()" style="width:14px;height:14px;margin:0;accent-color:var(--accent);">
+              Coils look dirty, clogged, or covered in debris
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text); cursor:pointer; margin:0;">
+              <input type="checkbox" value="ice or frost visible on unit or lines" onchange="updateLivePanel()" style="width:14px;height:14px;margin:0;accent-color:var(--accent);">
+              Ice or frost visible on the unit or copper lines
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text); cursor:pointer; margin:0;">
+              <input type="checkbox" value="copper lines have no insulation or insulation is damaged" onchange="updateLivePanel()" style="width:14px;height:14px;margin:0;accent-color:var(--accent);">
+              Copper lines missing insulation or insulation is torn
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text); cursor:pointer; margin:0;">
+              <input type="checkbox" value="disconnect box is open or fuses are visible" onchange="updateLivePanel()" style="width:14px;height:14px;margin:0;accent-color:var(--accent);">
+              Disconnect box is open or fuses look burnt
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text); cursor:pointer; margin:0;">
+              <input type="checkbox" value="unit is making grinding, squealing, or banging noise" onchange="updateLivePanel()" style="width:14px;height:14px;margin:0;accent-color:var(--accent);">
+              Making grinding, squealing, or banging noise
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text); cursor:pointer; margin:0;">
+              <input type="checkbox" value="unit looks physically damaged or bent fins" onchange="updateLivePanel()" style="width:14px;height:14px;margin:0;accent-color:var(--accent);">
+              Physical damage or fins are bent/crushed
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text); cursor:pointer; margin:0;">
+              <input type="checkbox" value="everything looks normal outside" onchange="updateLivePanel()" style="width:14px;height:14px;margin:0;accent-color:var(--accent);">
+              Everything looks normal — nothing obvious
+            </label>
+          </div>
+          <div class="how-to-know" onclick="toggleHow('how-condition')">
+            <span class="htk-trigger">&#63; What am I looking at?</span>
+            <div class="htk-body" id="how-condition">
+              <strong>Coils:</strong> The metal fins that wrap around the outside of the unit like a radiator. Dirty ones look grey/brown instead of silver, or have leaves/grass stuck in them.<br><br>
+              <strong>Ice or frost:</strong> White or clear ice on the copper pipes coming out of the unit, or on the unit itself. In summer this is always a problem sign.<br><br>
+              <strong>Copper lines:</strong> Two copper pipes going from the unit into your house. The larger one should be wrapped in black foam insulation. If that foam is missing or falling off, that's a problem.<br><br>
+              <strong>Disconnect box:</strong> A small grey metal box on the wall near the unit with a handle or pull-out block. Should be closed. If it's open or the pull-out is missing, the unit has no power.<br><br>
+              <strong>Fin damage:</strong> The thin metal fins on the coil can get bent by hail, lawn equipment, or impact. Bent fins block airflow and reduce efficiency.
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group p-important" id="fg-outdoor-brand">
+          <label>
+            <span class="priority-badge">Very helpful</span>
+            Brand and model (if visible)
+          </label>
+          <input type="text" id="outdoorBrand" placeholder="e.g. Carrier 24ACC636, Trane XR15" oninput="markFilled(this); updateLivePanel()">
+          <div class="how-to-know" onclick="toggleHow('how-brand')">
+            <span class="htk-trigger">&#63; Where do I find this?</span>
+            <div class="htk-body" id="how-brand">
+              Look for a metal data plate or sticker on the side of the outdoor unit — usually on the back or inside the access panel. It will say the brand name (Carrier, Trane, Lennox, Goodman, Rheem, etc.) and have a model number that starts with letters and numbers like "24ACC636A003" or "4TTR3036L1000A."<br><br>
+              Even just the brand name alone is helpful. The model number tells us the exact tonnage and series of the unit.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group p-critical" id="fg-heat">
+        <label>
+          <span class="priority-badge">Must have</span>
+          How does your home get heated?
+        </label>
+        <select id="heatSource" onchange="detectSystem(); markFilled(this)">
+          <option value="">Not sure</option>
+          <option value="gas">Gas furnace (blue flame, gas bill)</option>
+          <option value="electric_strip">Electric heat (no outdoor unit for heat)</option>
+          <option value="heatpump">Heat pump (outdoor unit runs in winter too)</option>
+          <option value="boiler">Boiler / radiators / in-floor heat</option>
+          <option value="none">No heat — AC only</option>
+        </select>
+        <div class="how-to-know" onclick="toggleHow('how-heat')">
+          <span class="htk-trigger">&#63; How do I know?</span>
+          <div class="htk-body" id="how-heat">
+            <strong>Gas furnace:</strong> You get a gas bill, and there's a metal box in a closet, basement, or garage with a flue pipe going up through the roof. Flames are blue when it fires.<br><br>
+            <strong>Heat pump:</strong> Your outdoor unit runs in winter too — go outside on a cold day and listen for it. Your thermostat may say "heat pump" or "emergency heat."<br><br>
+            <strong>Electric air handler:</strong> No gas bill for heat, outdoor unit only runs in summer, indoor unit is usually in a closet with just wires going in.<br><br>
+            <strong>Boiler:</strong> You have cast-iron radiators, baseboard heaters, or warm floors. No vents blowing air.
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group p-critical" id="fg-air">
+        <label>
+          <span class="priority-badge">Must have</span>
+          How is air delivered in your home?
+        </label>
+        <select id="airDelivery" onchange="detectSystem(); markFilled(this)">
+          <option value="">Not sure</option>
+          <option value="ducts">Through vents in ceiling / floor / walls</option>
+          <option value="mini">Wall-mounted indoor units (no vents)</option>
+          <option value="window">Window or portable unit</option>
+          <option value="radiant">No air — radiant / baseboard heat only</option>
+        </select>
+        <div class="how-to-know" onclick="toggleHow('how-air')">
+          <span class="htk-trigger">&#63; How do I know?</span>
+          <div class="htk-body" id="how-air">
+            <strong>Vents (ducts):</strong> Look up at your ceiling or down at your floor — you'll see rectangular grilles that blow air when the system runs. Most common in US homes.<br><br>
+            <strong>Wall-mounted units (mini-split):</strong> There's a white rectangular unit mounted high on the wall in each room with its own remote control. No vents in the ceiling.<br><br>
+            <strong>Window / portable:</strong> The unit sits in a window or on the floor with a hose going out a window. Usually only cools one room.<br><br>
+            <strong>Radiant / baseboard:</strong> Heat comes from the floor, from cast-iron radiators, or from electric baseboard heaters along the walls. No air blowing at all.
+          </div>
+        </div>
+      </div>
+
+      <div id="systemDetected" style="display:none; margin: 4px 0 12px; padding:8px 10px; background:rgba(0,212,255,0.08); border:1px solid rgba(0,212,255,0.25); border-radius:6px;">
+        <div style="font-size:10px; font-family:var(--mono); color:var(--accent); letter-spacing:1px; margin-bottom:3px;">SYSTEM DETECTED</div>
+        <div id="systemLabel" style="font-size:12px; color:var(--text); font-weight:500;"></div>
+      </div>
+
+      <div class="field-group p-important" id="fg-sqft">
+        <label>
+          <span class="priority-badge">Very helpful</span>
+          Approximate home size
+        </label>
+        <div class="field-hint">Not sure? Count the rooms — see the guide below.</div>
+        <select id="sqft" onchange="markFilled(this)">
+          <option value="">Not sure</option>
+          <option value="under 800 sq ft">Small — under 800 sq ft</option>
+          <option value="800–1200 sq ft">Medium-small — 800 to 1,200 sq ft</option>
+          <option value="1200–1800 sq ft">Medium — 1,200 to 1,800 sq ft</option>
+          <option value="1800–2500 sq ft">Medium-large — 1,800 to 2,500 sq ft</option>
+          <option value="2500–3500 sq ft">Large — 2,500 to 3,500 sq ft</option>
+          <option value="over 3500 sq ft">Very large — over 3,500 sq ft</option>
+        </select>
+        <div class="how-to-know" onclick="toggleHow('how-sqft')">
+          <span class="htk-trigger">&#63; How do I know my home size?</span>
+          <div class="htk-body" id="how-sqft">
+            <strong>Easiest:</strong> Look up your address on Zillow or your county property appraiser website — square footage is listed on every home.<br><br>
+            <strong>From your records:</strong> Check your mortgage docs, home inspection report, or property tax bill.<br><br>
+            <strong>Quick estimate by bedrooms:</strong> 1 bed ≈ under 800. 2 bed ≈ 900–1,200. 3 bed ≈ 1,200–1,800. 4 bed ≈ 1,800–2,500. 5+ bed ≈ over 2,500.<br><br>
+            <strong>Or use the room guide</strong> below — just pick the description that sounds like your place.
+          </div>
+        </div>
+
+        <div id="sqftHelper" style="margin-top:6px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; overflow:hidden;">
+          <button onclick="toggleSqftHelper()" style="width:100%; background:transparent; border:none; color:var(--accent); font-family:var(--mono); font-size:11px; letter-spacing:0.8px; padding:8px 12px; cursor:pointer; text-align:left; display:flex; justify-content:space-between; align-items:center;">
+            <span>HOW TO ESTIMATE YOUR SIZE</span>
+            <span id="sqftArrow" style="font-size:10px;">&#9660;</span>
+          </button>
+          <div id="sqftGuide" style="display:none; padding:0 12px 12px; font-size:12px; color:var(--text); line-height:1.7;">
+
+            <div style="color:var(--muted); font-size:11px; margin-bottom:8px; font-style:italic;">Pick the description that sounds most like your place:</div>
+
+            <div class="sqft-row" onclick="pickSqft('under 800 sq ft', this)">
+              <span class="sqft-dot" style="background:#00c896"></span>
+              <span><strong>Studio / 1-bed apartment or tiny house</strong><br>
+              <span style="color:var(--muted);">One main room, small kitchen, 1 bath. Fits in a hotel suite.</span></span>
+            </div>
+
+            <div class="sqft-row" onclick="pickSqft('800–1200 sq ft', this)">
+              <span class="sqft-dot" style="background:#7ecf6a"></span>
+              <span><strong>Small house or 2-bed apartment</strong><br>
+              <span style="color:var(--muted);">2 bedrooms, 1–2 baths, small living room. Takes ~10 min to vacuum.</span></span>
+            </div>
+
+            <div class="sqft-row" onclick="pickSqft('1200–1800 sq ft', this)">
+              <span class="sqft-dot" style="background:#ffc107"></span>
+              <span><strong>Average 3-bedroom home</strong><br>
+              <span style="color:var(--muted);">3 beds, 2 baths, living room, dining room. Most common size in the US.</span></span>
+            </div>
+
+            <div class="sqft-row" onclick="pickSqft('1800–2500 sq ft', this)">
+              <span class="sqft-dot" style="background:#ef9f27"></span>
+              <span><strong>Larger 3–4 bedroom home</strong><br>
+              <span style="color:var(--muted);">4 beds, 2–3 baths, maybe a bonus room or office. Feels spacious.</span></span>
+            </div>
+
+            <div class="sqft-row" onclick="pickSqft('2500–3500 sq ft', this)">
+              <span class="sqft-dot" style="background:#ff6b35"></span>
+              <span><strong>Large 4–5 bedroom home</strong><br>
+              <span style="color:var(--muted);">4–5 beds, 3+ baths, formal dining, probably two stories.</span></span>
+            </div>
+
+            <div class="sqft-row" onclick="pickSqft('over 3500 sq ft', this)">
+              <span class="sqft-dot" style="background:#e24b4a"></span>
+              <span><strong>Big house or small mansion</strong><br>
+              <span style="color:var(--muted);">5+ beds, 4+ baths, big kitchen, lots of living space. You'd know.</span></span>
+            </div>
+
+            <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border); color:var(--muted); font-size:11px;">
+              Or check your county property records, Zillow listing, or home inspection report — the exact number is usually there.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group p-important" id="fg-age">
+        <label>
+          <span class="priority-badge">Very helpful</span>
+          How old is the system?
+        </label>
+        <select id="unitAge" onchange="markFilled(this)">
+          <option value="">Don't know</option>
+          <option value="brand new (under 2 years)">Brand new — under 2 years</option>
+          <option value="fairly new (2–5 years)">Fairly new — 2 to 5 years</option>
+          <option value="middle-aged (6–12 years)">Middle-aged — 6 to 12 years</option>
+          <option value="older (13–20 years)">Older — 13 to 20 years</option>
+          <option value="very old (20+ years)">Very old — over 20 years</option>
+        </select>
+        <div class="how-to-know" onclick="toggleHow('how-age')">
+          <span class="htk-trigger">&#63; How do I know?</span>
+          <div class="htk-body" id="how-age">
+            <strong>Check the data plate</strong> — there's a metal or paper sticker on the side of your outdoor unit and indoor unit. Look for "MFG DATE," "Manufactured," or a serial number. Many serial numbers encode the year — e.g. if it starts with "1216" that usually means December 2016.<br><br>
+            <strong>Ask your home inspector</strong> — if you bought the home recently, the inspection report lists equipment age.<br><br>
+            <strong>Check your paperwork</strong> — warranty cards, receipts, or the previous owner's records.<br><br>
+            <strong>Look it up online</strong> — search the brand name + serial number decoder (e.g. "Carrier serial number date lookup") and you'll find the exact manufacture date.
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group p-optional" id="fg-symptom">
+        <label>
+          <span class="priority-badge">Optional</span>
+          Thermostat setting vs actual indoor temp
+        </label>
+        <input type="text" id="tempDelta" placeholder="e.g. set 72°, reading 80°" oninput="markFilled(this); updateLivePanel()">
+        <div class="how-to-know" onclick="toggleHow('how-temp')">
+          <span class="htk-trigger">&#63; How do I know?</span>
+          <div class="htk-body" id="how-temp">
+            <strong>Thermostat setting:</strong> The temperature you've asked the system to reach — usually the number you set it to.<br><br>
+            <strong>Actual indoor temp:</strong> What the thermostat screen currently reads as the room temperature. On most thermostats there are two numbers — a big one (what it is now) and a smaller one (what you want it to be).<br><br>
+            <strong>Example:</strong> "Set to 72, currently showing 81" — that 9-degree gap tells the AI a lot about how well the system is working.<br><br>
+            <strong>No thermostat display?</strong> Use a cheap indoor thermometer or even your phone's weather app for an indoor reading. Even a rough guess helps.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Quick Prompts</div>
+      <button class="quick-btn" onclick="quickPrompt('My AC is running but not cooling. Outside temp is 95°F. What should I check first?')">
+        <span class="qb-icon">❄</span>Running but not cooling
+      </button>
+      <button class="quick-btn" onclick="quickPrompt('Unit is freezing up — ice on the coil. What are the most likely causes and what order should I check them?')">
+        <span class="qb-icon">🧊</span>Ice / freeze-up on coil
+      </button>
+      <button class="quick-btn" onclick="quickPrompt('Condenser fan motor is running but compressor is not starting. What do I test?')">
+        <span class="qb-icon">⚡</span>Compressor not starting
+      </button>
+      <button class="quick-btn" onclick="quickPrompt('Customer says unit is short-cycling — turns on and off every few minutes. Walk me through diagnosis.')">
+        <span class="qb-icon">🔄</span>Short cycling
+      </button>
+      <button class="quick-btn" onclick="quickPrompt('High head pressure, suction pressure normal to low. What does this pattern tell me?')">
+        <span class="qb-icon">📊</span>High head pressure
+      </button>
+      <button class="quick-btn" onclick="quickPrompt('Customer is complaining the system is loud. It is a split system. Walk me through possible causes from most to least likely.')">
+        <span class="qb-icon">🔊</span>Unusual noise
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">New Chat</div>
+      <button class="quick-btn" onclick="clearChat()">+ Start fresh conversation</button>
+    </div>
+
+    <div class="sidebar-section" id="livePanel">
+      <div class="sidebar-label">What the AI sees right now</div>
+
+      <div id="liveSummary" style="margin-bottom:12px;">
+        <div class="live-empty">Fill in the fields above — I'll show you what I know so far.</div>
+      </div>
+
+      <div id="liveSuggestions" style="display:none;">
+        <div style="font-family:var(--mono); font-size:10px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px;">Suggestions to help me more</div>
+        <div id="suggestionList"></div>
+      </div>
+
+      <div id="liveConfidence" style="display:none; margin-top:10px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+          <span style="font-family:var(--mono); font-size:10px; color:var(--muted); letter-spacing:1px; text-transform:uppercase;">AI confidence</span>
+          <span id="confidenceLabel" style="font-family:var(--mono); font-size:11px; font-weight:600;"></span>
+        </div>
+        <div style="height:6px; background:var(--surface2); border-radius:3px; overflow:hidden; border:1px solid var(--border);">
+          <div id="confidenceBar" style="height:100%; border-radius:3px; transition:width 0.5s, background 0.5s; width:0%;"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="chat-area">
+    <div class="frustration-bar fr-mid" id="frustrationWrap">
+      <div class="fr-top-row">
+        <div class="fr-left">
+          <div class="fr-emoji-big" id="frEmoji">😑</div>
+          <div class="fr-title-block">
+            <div class="fr-title">How frustrated are you right now?</div>
+            <div class="fr-sublabel" id="frLabel">Frustrated — this needs to get fixed today</div>
+          </div>
+        </div>
+        <div class="fr-score" id="frValue">5<span class="fr-denom">/10</span></div>
+      </div>
+      <div class="fr-track-wrap">
+        <input type="range" id="frustration" min="1" max="10" value="5" oninput="updateFrustration(this.value)">
+      </div>
+      <div class="fr-tick-row" id="frTicks"></div>
+    </div>
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcome">
+        <div class="welcome-title">What's the situation?</div>
+        <div class="welcome-sub">Describe the symptom, the system, or the job. I'll ask the right follow-up questions and walk you through it like an experienced installer would.</div>
+        <div class="welcome-grid">
+          <div class="welcome-card" onclick="quickPrompt('My AC is running but not cooling at all. The air coming out is warm. Outside is about 90 degrees. It\'s a 5-year-old split system.')">
+            <div class="wc-icon">❄</div>
+            <div class="wc-title">Not cooling</div>
+            <div class="wc-desc">Running but blowing warm air, weak airflow, or not reaching setpoint</div>
+          </div>
+          <div class="welcome-card" onclick="quickPrompt('Help me size a new system for a 2,000 sq ft single story home in a hot and humid climate. Good insulation, double pane windows.')">
+            <div class="wc-icon">📐</div>
+            <div class="wc-title">Size a system</div>
+            <div class="wc-desc">Get a load estimate and equipment recommendation for a new install</div>
+          </div>
+          <div class="welcome-card" onclick="quickPrompt('I need to estimate a full split system replacement — 3 ton, including removal of old equipment, new linesets, and startup. What should I charge?')">
+            <div class="wc-icon">💰</div>
+            <div class="wc-title">Estimate a job</div>
+            <div class="wc-desc">Get pricing guidance for equipment, labor, and materials</div>
+          </div>
+          <div class="welcome-card" onclick="quickPrompt('I am so frustrated. Customer called back saying it\'s not working again after I just fixed it last week. Where do I even start?')">
+            <div class="wc-icon">😤</div>
+            <div class="wc-title">Vent + get help</div>
+            <div class="wc-desc">Describe what's frustrating you and get a clear path forward</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="input-bar">
+      <div class="input-wrap">
+        <textarea id="userInput" rows="1" placeholder="Describe the symptom, system, or job situation..." oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">&#10148;</button>
+      </div>
+      <div class="input-hint">Enter to send &nbsp;·&nbsp; Shift+Enter for new line &nbsp;·&nbsp; Free beta</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SYSTEM_PROMPTS = {
+  diagnose: `You are FieldMind, an AI HVAC diagnostic assistant built by an experienced HVAC installer and technician with decades of real-world field experience installing and troubleshooting split systems, heat pumps, package units, mini-splits, gas furnaces, and boilers.
+
+Your role is to help HVAC technicians and homeowners diagnose problems quickly and accurately.
+
+PERSONALITY: You think like an experienced tech, not a textbook. You give direct, practical answers. You say things like "first thing I'd check is..." and "nine times out of ten when I see that, it's...". You don't hedge everything with disclaimers. You speak plainly.
+
+DIAGNOSTIC APPROACH:
+- Always ask for the most important missing information first (don't pepper with 10 questions at once)
+- Think in terms of most likely cause first, not exhaustive lists
+- Consider refrigerant pressures, temperatures, electrical, airflow, and mechanical causes systematically
+- Always mention safety warnings when relevant (refrigerant handling, electrical hazards)
+- When giving steps, number them and put the cheapest/easiest checks first
+
+FORMATTING: Use clear sections. Bold the most likely cause. Use bullet points for check lists. Keep it practical — this person may be on a rooftop in 100 degree heat reading this on their phone.
+
+SYSTEM CONTEXT (if provided by user): Use the system type, refrigerant, square footage, and unit age from the sidebar to inform your answers.
+
+When you identify a likely fault, structure your response like:
+1. Most likely cause (and why)
+2. How to confirm it
+3. Fix or next steps
+4. What else it could be (if not confirmed)
+
+Never make up part numbers. If you don't know a specific model's quirk, say so.`,
+
+  size: `You are FieldMind, an HVAC system sizing assistant built on real field experience. Help users size HVAC systems using Manual J principles in plain language.
+
+Ask for: square footage, climate zone or city, insulation quality (poor/average/good/excellent), ceiling height, number of windows and their quality, whether it's single or multi-story, and any unusual heat loads (computers, commercial equipment, etc.).
+
+Give BTU recommendations, explain the logic, and suggest tonnage. Warn against oversizing (short cycling, humidity problems) and undersizing (can't reach setpoint on hottest days). Give both the "rule of thumb" number and the adjusted recommendation based on their specifics.
+
+Be practical. An experienced installer knows that Manual J is a starting point, not gospel. Factor in real-world conditions.`,
+
+  install: `You are FieldMind, an HVAC installation guidance assistant. You have personally installed dozens of systems and know exactly what goes wrong, what shortcuts cause callbacks, and what best practices actually matter vs. what's overkill.
+
+Cover: lineset sizing and routing, electrical requirements, pad and mounting, refrigerant line insulation, startup procedures, filter drier, thermostat wiring, commissioning checks, and common installation mistakes.
+
+Be specific. Don't just say "follow manufacturer instructions" — give the real-world guidance that experienced techs know.`,
+
+  estimate: `You are FieldMind, an HVAC job estimating assistant. Help techs and contractors price jobs fairly — not so high they lose the bid, not so low they lose money.
+
+For estimates, consider: equipment cost (ask brand tier preference — budget/mid/premium), labor hours for the job type, materials (linesets, disconnect, pad, whip, thermostat, filter drier), permit if applicable, and regional labor rates.
+
+Give a realistic range and explain what drives the high vs low end. Flag anything that commonly causes jobs to go over budget. Also help with presenting pricing to customers — how to explain value, handle price shoppers, and avoid race-to-the-bottom situations.`,
+
+  vent: `You are FieldMind, and right now you're just a fellow experienced tech who gets it. The user needs to vent about something frustrating — a difficult customer, a callback they can't figure out, a job that went sideways, or just the general stress of the trade.
+
+Listen first. Acknowledge the frustration genuinely — don't immediately jump to solutions. Say things like "yeah, that's brutal" or "I've been in that exact situation." Then, once they feel heard, help them think through it clearly.
+
+You understand: difficult customers who don't trust techs, callbacks that make you question your own work, jobs that look simple but turn into nightmares, dispatchers who oversell timelines, heat exhaustion and physical toll of the job, customers who got a cheaper quote after you diagnosed the problem.
+
+Be real. Be human. Then be helpful.`
+};
+
+let currentMode = 'diagnose';
+let conversationHistory = [];
+let isLoading = false;
+
+function setMode(mode, btn) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  clearChat();
+}
+
+function clearChat() {
+  conversationHistory = [];
+  const messages = document.getElementById('messages');
+  messages.innerHTML = '';
+  const welcome = document.createElement('div');
+  welcome.className = 'welcome';
+  welcome.id = 'welcome';
+  welcome.innerHTML = document.querySelector('.welcome') ? '' : '';
+  // Re-render welcome
+  messages.innerHTML = `<div class="welcome" id="welcome">
+    <div class="welcome-title">What's the situation?</div>
+    <div class="welcome-sub">Describe the symptom, the system, or the job. I'll walk you through it like an experienced installer would.</div>
+    <div class="welcome-grid">
+      <div class="welcome-card" onclick="quickPrompt('My AC is running but not cooling at all. The air coming out is warm. Outside is about 90 degrees.')">
+        <div class="wc-icon">❄</div>
+        <div class="wc-title">Not cooling</div>
+        <div class="wc-desc">Running but blowing warm air, weak airflow</div>
+      </div>
+      <div class="welcome-card" onclick="quickPrompt('Help me size a new system for a 2,000 sq ft home in a hot humid climate.')">
+        <div class="wc-icon">📐</div>
+        <div class="wc-title">Size a system</div>
+        <div class="wc-desc">Load estimate and equipment recommendation</div>
+      </div>
+      <div class="welcome-card" onclick="quickPrompt('I need to estimate a full 3 ton split system replacement including labor. What should I charge?')">
+        <div class="wc-icon">💰</div>
+        <div class="wc-title">Estimate a job</div>
+        <div class="wc-desc">Pricing guidance for equipment, labor, materials</div>
+      </div>
+      <div class="welcome-card" onclick="quickPrompt('I am so frustrated. Customer called back saying it is not working again after I just fixed it last week.')">
+        <div class="wc-icon">😤</div>
+        <div class="wc-title">Vent + get help</div>
+        <div class="wc-desc">Describe what\'s frustrating you</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+const FR_DATA = {
+  1:  { emoji: '😌', label: 'Just curious — no rush at all',                  cls: 'fr-low',  color: '#00c896' },
+  2:  { emoji: '🙂', label: 'Minor issue, no big deal yet',                   cls: 'fr-low',  color: '#00c896' },
+  3:  { emoji: '🤔', label: 'Something feels off, want to figure it out',     cls: 'fr-low',  color: '#7ecf6a' },
+  4:  { emoji: '😐', label: 'Getting a little annoying now',                  cls: 'fr-mid',  color: '#ffc107' },
+  5:  { emoji: '😑', label: 'Frustrated — this needs to get fixed today',     cls: 'fr-mid',  color: '#ffc107' },
+  6:  { emoji: '😤', label: 'Really frustrated — been dealing with this',     cls: 'fr-mid',  color: '#ef9f27' },
+  7:  { emoji: '😠', label: "Angry — it's hot/cold and nothing is working",   cls: 'fr-high', color: '#ff6b35' },
+  8:  { emoji: '🤬', label: 'Furious — callbacks, wasted time, losing money', cls: 'fr-high', color: '#ff6b35' },
+  9:  { emoji: '🔥', label: 'At my limit — need an answer RIGHT NOW',         cls: 'fr-max',  color: '#e24b4a' },
+  10: { emoji: '💀', label: "DONE. Fix this or I'm calling someone else.",    cls: 'fr-max',  color: '#e24b4a' },
+};
+
+function buildTicks() {
+  const row = document.getElementById('frTicks');
+  if (!row) return;
+  for (let i = 1; i <= 10; i++) {
+    const span = document.createElement('span');
+    span.className = 'fr-tick' + (i === 5 ? ' active' : '');
+    span.id = 'tick-' + i;
+    span.textContent = i;
+    row.appendChild(span);
+  }
+}
+
+function updateFrustration(val) {
+  const v = parseInt(val);
+  const d = FR_DATA[v];
+
+  document.getElementById('frEmoji').textContent = d.emoji;
+  document.getElementById('frLabel').textContent = d.label;
+  document.getElementById('frLabel').style.color = d.color;
+
+  const scoreEl = document.getElementById('frValue');
+  scoreEl.innerHTML = v + '<span class="fr-denom">/10</span>';
+  scoreEl.style.color = d.color;
+
+  const wrap = document.getElementById('frustrationWrap');
+  wrap.className = 'frustration-bar ' + d.cls;
+
+  // Update thumb color via CSS custom property
+  document.getElementById('frustration').style.color = d.color;
+
+  // Tick highlights
+  for (let i = 1; i <= 10; i++) {
+    const t = document.getElementById('tick-' + i);
+    if (t) {
+      t.classList.toggle('active', i === v);
+      t.style.color = i === v ? d.color : '';
+    }
+  }
+
+  updateLivePanel();
+  // Shake emoji on 9-10
+  const emojiEl = document.getElementById('frEmoji');
+  if (v >= 9) {
+    emojiEl.style.animation = 'none';
+    setTimeout(() => emojiEl.style.animation = 'shake 0.4s ease', 10);
+  } else {
+    emojiEl.style.animation = '';
+  }
+}
+
+// Init ticks on load
+document.addEventListener('DOMContentLoaded', () => {
+  buildTicks();
+  updateFrustration(5);
+  updateLivePanel();
+  // Load saved API key
+  const savedKey = localStorage.getItem('fm_api_key');
+  if (savedKey) {
+    document.getElementById('apiKeyInput').value = savedKey;
+    checkApiKey(savedKey);
+  }
+});
+
+function activateKey() {
+  const input = document.getElementById('apiKeyInput');
+  const status = document.getElementById('apiKeyStatus');
+  const bar = document.getElementById('apiKeyBar');
+  const val = input.value.trim();
+
+  if (!val || val.length < 10) {
+    status.textContent = '✗ No key found — paste it first';
+    status.style.color = '#e24b4a';
+    input.style.borderColor = 'rgba(226,75,74,0.6)';
+    input.focus();
+    return;
+  }
+
+  // Store it multiple ways so it cannot get lost
+  window._FM_API_KEY = val;
+  try { localStorage.setItem('fm_api_key', val); } catch(e) {}
+  try { sessionStorage.setItem('fm_api_key', val); } catch(e) {}
+
+  // Visual confirmation
+  status.textContent = '✓ ACTIVE';
+  status.style.color = '#00c896';
+  status.style.fontWeight = '700';
+  input.style.borderColor = 'rgba(0,200,150,0.6)';
+  bar.style.borderBottomColor = 'rgba(0,200,150,0.5)';
+  bar.style.background = 'rgba(0,200,150,0.08)';
+
+  // Flash the button green
+  const btn = document.querySelector('button[onclick="activateKey()"]');
+  if (btn) {
+    btn.style.background = '#00c896';
+    btn.textContent = '✓ ACTIVE';
+    setTimeout(() => {
+      btn.style.background = '#ff6b35';
+      btn.textContent = 'ACTIVATE';
+    }, 2000);
+  }
+
+  alert('API key activated! Now type your HVAC question in the chat box at the bottom and hit send.');
+}
+
+function checkApiKey(val) {
+  const status = document.getElementById('apiKeyStatus');
+  const bar    = document.getElementById('apiKeyBar');
+  const input  = document.getElementById('apiKeyInput');
+  const trimmed = val.trim();
+
+  // Accept any sk-ant- key OR any key over 20 chars (some formats vary)
+  const looksValid = (trimmed.startsWith('sk-ant-') || trimmed.startsWith('sk-')) && trimmed.length > 20;
+
+  if (looksValid) {
+    status.textContent = '✓ Ready';
+    status.style.color = '#00c896';
+    input.style.borderColor = 'rgba(0,200,150,0.5)';
+    bar.style.borderBottomColor = 'rgba(0,200,150,0.4)';
+    // Save immediately
+    try { localStorage.setItem('fm_api_key', trimmed); } catch(e) {}
+  } else if (trimmed.length > 5) {
+    status.textContent = '✗ Check key format';
+    status.style.color = '#e24b4a';
+    input.style.borderColor = 'rgba(226,75,74,0.5)';
+  } else {
+    status.textContent = 'Paste key above';
+    status.style.color = 'var(--muted)';
+    input.style.borderColor = 'rgba(255,107,53,0.4)';
+  }
+}
+
+function getApiKey() {
+  // 1. Check in-memory variable (set by activateKey)
+  if (window._FM_API_KEY && window._FM_API_KEY.length > 10) {
+    return window._FM_API_KEY;
+  }
+  // 2. Check input field directly
+  const inputEl = document.getElementById('apiKeyInput');
+  if (inputEl && inputEl.value.trim().length > 10) {
+    window._FM_API_KEY = inputEl.value.trim();
+    return window._FM_API_KEY;
+  }
+  // 3. Check localStorage
+  try {
+    const stored = localStorage.getItem('fm_api_key');
+    if (stored && stored.length > 10) {
+      window._FM_API_KEY = stored;
+      return stored;
+    }
+  } catch(e) {}
+  // 4. Check sessionStorage
+  try {
+    const sess = sessionStorage.getItem('fm_api_key');
+    if (sess && sess.length > 10) {
+      window._FM_API_KEY = sess;
+      return sess;
+    }
+  } catch(e) {}
+  return '';
+}
+
+function toggleOutdoorDetail(val) {
+  const detail = document.getElementById('outdoorDetail');
+  if (!detail) return;
+  detail.style.display = val === 'yes' ? 'block' : 'none';
+  if (val === 'yes') {
+    detail.style.animation = 'none';
+    detail.offsetHeight; // reflow
+    detail.style.animation = 'fadeSlideIn 0.25s ease';
+  }
+}
+
+function toggleHow(id) {
+  const body = document.getElementById(id);
+  if (!body) return;
+  const wrap = body.closest('.how-to-know');
+  const isOpen = wrap.classList.contains('open');
+  // Close all others first
+  document.querySelectorAll('.how-to-know.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) wrap.classList.add('open');
+}
+
+// ── Live Panel Engine ──────────────────────────────────────────
+function updateLivePanel() {
+  const outdoor  = document.getElementById('hasOutdoor').value;
+  const heat     = document.getElementById('heatSource').value;
+  const air      = document.getElementById('airDelivery').value;
+  const sqft     = document.getElementById('sqft').value;
+  const age      = document.getElementById('unitAge').value;
+  const tempDelta= document.getElementById('tempDelta').value;
+  const detected = document.getElementById('systemLabel').textContent;
+  const frVal    = parseInt(document.getElementById('frustration').value);
+  const outdoorRunning = document.getElementById('outdoorRunning') ? document.getElementById('outdoorRunning').value : '';
+  const outdoorBrand   = document.getElementById('outdoorBrand')   ? document.getElementById('outdoorBrand').value   : '';
+  const outdoorChecks  = [...document.querySelectorAll('#outdoorConditionChecks input:checked')].map(c => c.value);
+  const frData   = FR_DATA[frVal];
+
+  const summary = document.getElementById('liveSummary');
+  const suggBox = document.getElementById('liveSuggestions');
+  const suggList= document.getElementById('suggestionList');
+  const confBox = document.getElementById('liveConfidence');
+  const confBar = document.getElementById('confidenceBar');
+  const confLbl = document.getElementById('confidenceLabel');
+
+  // Build what-we-know items
+  let items = [];
+  let score = 0; // confidence 0–100
+
+  // Frustration always known
+  items.push({ icon: frData.emoji, label: 'Frustration level', text: `${frVal}/10 — ${frData.label}` });
+  score += 15;
+
+  if (detected) {
+    items.push({ icon: '🏠', label: 'System type (detected)', text: detected });
+    score += 30;
+  } else if (outdoor || heat || air) {
+    items.push({ icon: '🔍', label: 'System type', text: 'Still figuring out — answer more fields above' });
+    score += 5;
+  }
+
+  if (outdoorRunning) { items.push({ icon: '⚡', label: 'Outdoor unit status', text: outdoorRunning }); score += 20; }
+  if (outdoorBrand)   { items.push({ icon: '🏷',  label: 'Brand / model',       text: outdoorBrand });   score += 10; }
+  if (outdoorChecks.length > 0) {
+    items.push({ icon: '👁', label: 'Visual observations', text: outdoorChecks.join('; ') });
+    score += 15;
+  }
+  if (sqft)      { items.push({ icon: '📐', label: 'Home size',     text: sqft });      score += 15; }
+  if (age)       { items.push({ icon: '📅', label: 'System age',    text: age });        score += 15; }
+  if (tempDelta) { items.push({ icon: '🌡', label: 'Temp reading',  text: tempDelta });  score += 20; }
+
+  // Render items
+  if (items.length === 1) {
+    summary.innerHTML = "<div class='live-empty'>Fill in the fields above — I'll show you what I know so far.</div>";
+  } else {
+    summary.innerHTML = items.map(i => `
+      <div class="live-item">
+        <span class="li-icon">${i.icon}</span>
+        <span class="li-text"><span class="li-label">${i.label}</span>${i.text}</span>
+      </div>`).join('');
+  }
+
+  // Build smart suggestions
+  let suggestions = [];
+
+  if (!outdoor && !detected) {
+    suggestions.push({ cls: 'si-warn', text: "Step outside — does your home have an outdoor unit? This is the most important question." });
+  }
+  if (!heat && outdoor) {
+    suggestions.push({ cls: 'si-warn', text: "How does your home get heated? This helps identify your exact system type." });
+  }
+  if (!air) {
+    suggestions.push({ cls: 'si-warn', text: "Do you have vents in the ceiling/floor, or wall-mounted units? Helps narrow things down fast." });
+  }
+  if (!sqft) {
+    suggestions.push({ cls: 'si-tip', text: "Adding a rough home size helps the AI recommend the right equipment tonnage." });
+  }
+  if (!age && detected) {
+    suggestions.push({ cls: 'si-tip', text: "System age is helpful — older units (12+ years) have very different failure patterns." });
+  }
+  if (!tempDelta && detected && frVal >= 5) {
+    suggestions.push({ cls: 'si-tip', text: "What does your thermostat say vs. what is the actual indoor temp? Big clue for diagnosis." });
+  }
+  if (frVal >= 8 && suggestions.length === 0) {
+    suggestions.push({ cls: 'si-tip', text: "You're ready — just describe the problem in the chat and I'll get straight to the point." });
+  }
+  if (suggestions.length === 0 && score >= 80) {
+    suggestions.push({ cls: 'si-tip', text: "You're all set — the AI has enough context. Just describe what's happening." });
+  }
+
+  if (suggestions.length > 0) {
+    suggList.innerHTML = suggestions.map(s => `
+      <div class="suggestion-item ${s.cls}">
+        <span class="si-dot"></span>
+        <span>${s.text}</span>
+      </div>`).join('');
+    suggBox.style.display = 'block';
+  } else {
+    suggBox.style.display = 'none';
+  }
+
+  // Confidence bar
+  score = Math.min(score, 100);
+  if (score > 15) {
+    confBox.style.display = 'block';
+    confBar.style.width = score + '%';
+    if (score < 35) {
+      confBar.style.background = '#e24b4a';
+      confLbl.textContent = 'Low';
+      confLbl.style.color = '#e24b4a';
+    } else if (score < 65) {
+      confBar.style.background = '#ffc107';
+      confLbl.textContent = 'Getting there';
+      confLbl.style.color = '#ffc107';
+    } else if (score < 85) {
+      confBar.style.background = '#ef9f27';
+      confLbl.textContent = 'Good';
+      confLbl.style.color = '#ef9f27';
+    } else {
+      confBar.style.background = '#00c896';
+      confLbl.textContent = 'Strong';
+      confLbl.style.color = '#00c896';
+    }
+  } else {
+    confBox.style.display = 'none';
+  }
+}
+// ────────────────────────────────────────────────────────────────
+
+function toggleSqftHelper() {
+  const guide = document.getElementById('sqftGuide');
+  const arrow = document.getElementById('sqftArrow');
+  const open = guide.style.display === 'block';
+  guide.style.display = open ? 'none' : 'block';
+  arrow.innerHTML = open ? '&#9660;' : '&#9650;';
+}
+
+function pickSqft(value, rowEl) {
+  // Set the dropdown
+  const sel = document.getElementById('sqft');
+  for (let i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].value === value) { sel.selectedIndex = i; break; }
+  }
+  markFilled(sel);
+  // Highlight selected row
+  document.querySelectorAll('.sqft-row').forEach(r => r.classList.remove('selected'));
+  rowEl.classList.add('selected');
+  // Close the guide after a beat
+  setTimeout(() => {
+    document.getElementById('sqftGuide').style.display = 'none';
+    document.getElementById('sqftArrow').innerHTML = '&#9660;';
+  }, 600);
+}
+
+function markFilled(el) {
+  const group = el.closest('.field-group');
+  if (!group) return;
+  if (el.value && el.value !== '') {
+    group.classList.add('filled');
+  } else {
+    group.classList.remove('filled');
+  }
+  updateLivePanel();
+}
+
+function detectSystem() { updateLivePanel();
+  const outdoor = document.getElementById('hasOutdoor').value;
+  const heat = document.getElementById('heatSource').value;
+  const air = document.getElementById('airDelivery').value;
+  let detected = '';
+  if (air === 'window') detected = 'Window or portable AC unit';
+  else if (air === 'radiant') detected = 'Boiler / radiant heat system (no forced air)';
+  else if (air === 'mini') detected = 'Mini-split / ductless system';
+  else if (outdoor === 'yes' && heat === 'heatpump') detected = 'Heat pump (provides both heating and cooling)';
+  else if (outdoor === 'yes' && heat === 'gas') detected = 'Split system — gas furnace + central AC';
+  else if (outdoor === 'yes' && heat === 'electric_strip') detected = 'Split system — electric air handler + central AC';
+  else if (outdoor === 'no' && heat === 'boiler') detected = 'Boiler / radiant heat (no AC or separate)';
+  else if (outdoor === 'yes' && air === 'ducts') detected = 'Central split system (AC + heating)';
+  else if (outdoor === 'no' && air === 'ducts') detected = 'Likely gas furnace or electric air handler only';
+  const box = document.getElementById('systemDetected');
+  const label = document.getElementById('systemLabel');
+  if (detected) { label.textContent = detected; box.style.display = 'block'; }
+  else { box.style.display = 'none'; }
+}
+
+function getSystemContext() {
+  const outdoor = document.getElementById('hasOutdoor').value;
+  const heat = document.getElementById('heatSource').value;
+  const air = document.getElementById('airDelivery').value;
+  const sqft = document.getElementById('sqft').value;
+  const age = document.getElementById('unitAge').value;
+  const tempDelta = document.getElementById('tempDelta').value;
+  const detectedLabel = document.getElementById('systemLabel').textContent;
+  let ctx = '';
+  if (detectedLabel) ctx += `Detected system type: ${detectedLabel}. `;
+  else {
+    if (outdoor) ctx += `Has outdoor unit: ${outdoor}. `;
+    if (heat) ctx += `Heat source: ${heat}. `;
+    if (air) ctx += `Air delivery: ${air}. `;
+  }
+  if (sqft) ctx += `Home size: ${sqft}. `;
+  if (age) ctx += `System age: ${age}. `;
+  if (tempDelta) ctx += `Thermostat vs actual temp: ${tempDelta}. `;
+  const outdoorRunning = document.getElementById('outdoorRunning') ? document.getElementById('outdoorRunning').value : '';
+  const outdoorBrand   = document.getElementById('outdoorBrand')   ? document.getElementById('outdoorBrand').value   : '';
+  const outdoorChecks  = [...document.querySelectorAll('#outdoorConditionChecks input:checked')].map(c => c.value);
+  if (outdoorRunning)          ctx += `Outdoor unit status: ${outdoorRunning}. `;
+  if (outdoorBrand)            ctx += `Brand/model: ${outdoorBrand}. `;
+  if (outdoorChecks.length>0)  ctx += `Visual observations on outdoor unit: ${outdoorChecks.join(', ')}. `;
+  const frVal = document.getElementById('frustration').value;
+  const frLabel = document.getElementById('frLabel').textContent;
+  ctx += `User frustration level: ${frVal}/10 — "${frLabel}". `;
+  return ctx ? `[System context — do NOT ask user to repeat this info, use it silently. IMPORTANT: adjust your tone based on the frustration level. Level 1-3: calm and educational. Level 4-6: efficient and direct, skip the fluff. Level 7-8: get straight to the point, acknowledge their frustration briefly first. Level 9-10: lead with empathy, one sentence max, then immediate action steps — no lengthy explanations. ${ctx}]` : '';
+}
+
+function quickPrompt(text) {
+  document.getElementById('userInput').value = text;
+  sendMessage();
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function addMessage(role, content) {
+  const welcome = document.getElementById('welcome');
+  if (welcome) welcome.remove();
+
+  const messages = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = `message ${role}`;
+
+  const avatar = document.createElement('div');
+  avatar.className = `avatar ${role === 'user' ? 'user' : 'ai'}`;
+  avatar.textContent = role === 'user' ? 'YOU' : 'FM';
+
+  const bubble = document.createElement('div');
+  bubble.className = `bubble ${role === 'user' ? 'user' : ''}`;
+
+  if (role === 'assistant') {
+    bubble.innerHTML = formatResponse(content);
+  } else {
+    bubble.textContent = content;
+  }
+
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+  return bubble;
+}
+
+function formatResponse(text) {
+  // Convert markdown-ish formatting to HTML
+  text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  text = text.replace(/^### (.*)/gm, '<div class="section-head">$1</div>');
+  text = text.replace(/^## (.*)/gm, '<div class="section-head">$1</div>');
+  text = text.replace(/^\d+\. (.*)/gm, '<li>$1</li>');
+  text = text.replace(/^- (.*)/gm, '<li>$1</li>');
+  text = text.replace(/(<li>.*<\/li>\n?)+/g, m => `<ul>${m}</ul>`);
+  text = text.replace(/\n\n/g, '</p><p>');
+  text = text.replace(/\n/g, '<br>');
+  return `<p>${text}</p>`;
+}
+
+function showTyping() {
+  const welcome = document.getElementById('welcome');
+  if (welcome) welcome.remove();
+  const messages = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'message';
+  div.id = 'typing-indicator';
+  div.innerHTML = `
+    <div class="avatar ai">FM</div>
+    <div class="bubble">
+      <div class="typing"><span></span><span></span><span></span></div>
+    </div>`;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing-indicator');
+  if (t) t.remove();
+}
+
+async function sendMessage() {
+  if (isLoading) return;
+  const input = document.getElementById('userInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const sendBtn = document.getElementById('sendBtn');
+  input.value = '';
+  input.style.height = 'auto';
+  isLoading = true;
+  sendBtn.disabled = true;
+
+  const ctx = getSystemContext();
+  const userMessage = ctx ? `${text}\n\n${ctx}` : text;
+
+  addMessage('user', text);
+  conversationHistory.push({ role: 'user', content: userMessage });
+  showTyping();
+
+  try {
+    const apiKey = getApiKey();
+    if (!apiKey) {
+      removeTyping();
+      // Debug — show what we actually see
+      const inputVal = document.getElementById('apiKeyInput').value;
+      const storedVal = (() => { try { return localStorage.getItem('fm_api_key') || 'nothing stored'; } catch(e) { return 'storage blocked'; } })();
+      addMessage('assistant', `⚠️ API key not detected.\n\nWhat I see in the input field: "${inputVal.length > 0 ? inputVal.substring(0,12) + '...' : 'empty'}"\nStored key: "${storedVal ? storedVal.substring(0,12) + '...' : 'none'}"\n\nFix: Paste your key (starts with sk-ant-) into the orange bar at the top, then try again. If it still says "Not set" after pasting, try clicking somewhere else on the page first.`);
+      isLoading = false;
+      document.getElementById('sendBtn').disabled = false;
+      return;
+    }
+
+    // Use Netlify function when hosted, direct API when local
+    const isNetlify = window.location.hostname.includes('netlify.app');
+    let data;
+
+    if (isNetlify) {
+      const response = await fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          apiKey: apiKey,
+          system: SYSTEM_PROMPTS[currentMode],
+          messages: conversationHistory
+        })
+      });
+      data = await response.json();
+    } else {
+      // Direct API call for local testing
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 1000,
+          system: SYSTEM_PROMPTS[currentMode],
+          messages: conversationHistory
+        })
+      });
+      data = await response.json();
+    }
+    removeTyping();
+
+    if (data.content && data.content[0]) {
+      const reply = data.content[0].text;
+      conversationHistory.push({ role: 'assistant', content: reply });
+      addMessage('assistant', reply);
+    } else if (data.error) {
+      addMessage('assistant', `API error: ${data.error.message}. Double-check your API key in the bar at the top.`);
+    } else {
+      addMessage('assistant', 'Something went wrong. Check your API key and try again.');
+    }
+  } catch (err) {
+    removeTyping();
+    addMessage('assistant', `Connection error: ${err.message}. Make sure you opened this file through a server, not by double-clicking it.`);
+  }
+
+  isLoading = false;
+  sendBtn.disabled = false;
+  input.focus();
+}
+</script>
+</body>
+</html>
