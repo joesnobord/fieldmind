@@ -1684,11 +1684,11 @@ async function sendMessage() {
       return;
     }
 
-    // Use Netlify function when hosted, direct API when local
-    const isNetlify = window.location.hostname.includes('netlify.app');
+    // Use Netlify function when hosted, direct API when local (localhost/127.0.0.1)
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     let data;
 
-    if (isNetlify) {
+    if (!isLocal) {
       const response = await fetch('/.netlify/functions/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
