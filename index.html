@@ -201,63 +201,18 @@
 
   .field-group.filled select, .field-group.filled input { border-color: rgba(0,200,150,0.45) !important; }
 
-  /* Frustration meter — full width bar above chat */
-  .frustration-bar {
-    flex-shrink: 0;
-    padding: 18px 28px 14px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    transition: background 0.4s, border-color 0.4s;
-  }
   .frustration-bar.fr-low  { background: rgba(0,200,150,0.06);  border-bottom-color: rgba(0,200,150,0.25); }
   .frustration-bar.fr-mid  { background: rgba(255,193,7,0.06);   border-bottom-color: rgba(255,193,7,0.25); }
   .frustration-bar.fr-high { background: rgba(255,107,53,0.08);  border-bottom-color: rgba(255,107,53,0.3); }
   .frustration-bar.fr-max  { background: rgba(226,75,74,0.1);    border-bottom-color: rgba(226,75,74,0.4); }
 
-  .fr-top-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
-  }
-  .fr-left { display: flex; align-items: center; gap: 10px; }
-  .fr-emoji-big {
-    font-size: 32px;
-    line-height: 1;
-    transition: all 0.2s;
-    filter: grayscale(0);
-  }
-  .fr-title-block {}
-  .fr-title {
-    font-family: var(--display);
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text);
-    letter-spacing: 0.3px;
-  }
-  .fr-sublabel {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 2px;
-    font-style: italic;
-    transition: color 0.2s;
-    min-height: 16px;
-  }
   .fr-score {
     font-family: var(--mono);
-    font-size: 36px;
     font-weight: 700;
     line-height: 1;
     transition: color 0.3s;
-    min-width: 64px;
-    text-align: right;
-  }
-  .fr-score .fr-denom {
-    font-size: 18px;
-    opacity: 0.45;
   }
 
-  .fr-track-wrap { position: relative; }
   input[type="range"]#frustration {
     width: 100%;
     height: 8px;
@@ -421,6 +376,38 @@
     margin: 0;
   }
   #userInput::placeholder { color: var(--muted); }
+  .input-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .upload-btn {
+    background: transparent;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    width: 34px;
+    height: 34px;
+    border-radius: 7px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    font-size: 16px;
+    position: relative;
+  }
+  .upload-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .upload-btn input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    font-size: 0;
+  }
   .send-btn {
     background: var(--accent);
     border: none;
@@ -438,6 +425,59 @@
   }
   .send-btn:hover { background: var(--accent2); }
   .send-btn:disabled { background: var(--border2); cursor: not-allowed; color: var(--muted); }
+
+  /* Image previews in input bar */
+  .image-preview-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 0 0 10px;
+  }
+  .img-thumb {
+    position: relative;
+    width: 56px;
+    height: 56px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border2);
+    flex-shrink: 0;
+  }
+  .img-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .img-thumb .remove-img {
+    position: absolute;
+    top: 2px; right: 2px;
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 16px; height: 16px;
+    font-size: 10px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1;
+  }
+
+  /* Image bubbles in chat */
+  .bubble .chat-image {
+    max-width: 260px;
+    max-height: 200px;
+    border-radius: 8px;
+    margin-top: 8px;
+    display: block;
+    border: 1px solid var(--border);
+  }
+
+  /* Compact frustration bar */
+  .frustration-bar {
+    flex-shrink: 0;
+    padding: 10px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.4s, border-color 0.4s;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
   .input-hint {
     font-size: 11px;
     color: var(--muted);
@@ -998,20 +1038,11 @@
 
   <div class="chat-area">
     <div class="frustration-bar fr-mid" id="frustrationWrap">
-      <div class="fr-top-row">
-        <div class="fr-left">
-          <div class="fr-emoji-big" id="frEmoji">😑</div>
-          <div class="fr-title-block">
-            <div class="fr-title">How frustrated are you right now?</div>
-            <div class="fr-sublabel" id="frLabel">Frustrated — this needs to get fixed today</div>
-          </div>
-        </div>
-        <div class="fr-score" id="frValue">5<span class="fr-denom">/10</span></div>
-      </div>
-      <div class="fr-track-wrap">
-        <input type="range" id="frustration" min="1" max="10" value="5" oninput="updateFrustration(this.value)">
-      </div>
-      <div class="fr-tick-row" id="frTicks"></div>
+      <div class="fr-emoji-big" id="frEmoji" style="font-size:22px; flex-shrink:0;">😑</div>
+      <div style="font-family:var(--display); font-size:11px; font-weight:600; color:var(--muted); white-space:nowrap; flex-shrink:0;">FRUSTRATION</div>
+      <input type="range" id="frustration" min="1" max="10" value="5" oninput="updateFrustration(this.value)" style="flex:1; min-width:80px;">
+      <div class="fr-score" id="frValue" style="font-size:18px; min-width:40px; text-align:right;">5<span class="fr-denom" style="font-size:11px;">/10</span></div>
+      <div class="fr-sublabel" id="frLabel" style="font-size:11px; color:var(--muted); font-style:italic; white-space:nowrap; max-width:220px; overflow:hidden; text-overflow:ellipsis;">Frustrated — this needs to get fixed today</div>
     </div>
     <div class="messages" id="messages">
       <div class="welcome" id="welcome">
@@ -1042,9 +1073,16 @@
       </div>
     </div>
     <div class="input-bar">
+      <div id="imagePreviewBar" class="image-preview-bar" style="display:none;"></div>
       <div class="input-wrap">
         <textarea id="userInput" rows="1" placeholder="Describe the symptom, system, or job situation..." oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
-        <button class="send-btn" id="sendBtn" onclick="sendMessage()">&#10148;</button>
+        <div class="input-actions">
+          <button class="upload-btn" title="Upload a photo">
+            📷
+            <input type="file" accept="image/*" multiple onchange="handleImageUpload(this)">
+          </button>
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()">&#10148;</button>
+        </div>
       </div>
       <div class="input-hint">Enter to send &nbsp;·&nbsp; Shift+Enter for new line &nbsp;·&nbsp; Beta — free to use</div>
     </div>
@@ -1110,6 +1148,40 @@ Be real. Be human. Then be helpful.`
 let currentMode = 'diagnose';
 let conversationHistory = [];
 let isLoading = false;
+let pendingImages = []; // {base64, mediaType, previewUrl}
+
+function handleImageUpload(input) {
+  const files = Array.from(input.files);
+  files.forEach(file => {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target.result;
+      const base64 = dataUrl.split(',')[1];
+      const mediaType = file.type;
+      pendingImages.push({ base64, mediaType, previewUrl: dataUrl, name: file.name });
+      renderImagePreviews();
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = ''; // reset so same file can be re-added
+}
+
+function renderImagePreviews() {
+  const bar = document.getElementById('imagePreviewBar');
+  if (pendingImages.length === 0) { bar.style.display = 'none'; bar.innerHTML = ''; return; }
+  bar.style.display = 'flex';
+  bar.innerHTML = pendingImages.map((img, i) => `
+    <div class="img-thumb">
+      <img src="${img.previewUrl}" alt="upload ${i+1}">
+      <button class="remove-img" onclick="removeImage(${i})">✕</button>
+    </div>`).join('');
+}
+
+function removeImage(index) {
+  pendingImages.splice(index, 1);
+  renderImagePreviews();
+}
 
 function setMode(mode, btn) {
   currentMode = mode;
@@ -1198,15 +1270,6 @@ function updateFrustration(val) {
   // Update thumb color via CSS custom property
   document.getElementById('frustration').style.color = d.color;
 
-  // Tick highlights
-  for (let i = 1; i <= 10; i++) {
-    const t = document.getElementById('tick-' + i);
-    if (t) {
-      t.classList.toggle('active', i === v);
-      t.style.color = i === v ? d.color : '';
-    }
-  }
-
   updateLivePanel();
   // Shake emoji on 9-10
   const emojiEl = document.getElementById('frEmoji');
@@ -1220,7 +1283,6 @@ function updateFrustration(val) {
 
 // Init ticks on load
 document.addEventListener('DOMContentLoaded', () => {
-  buildTicks();
   updateFrustration(5);
   updateLivePanel();
 });
@@ -1477,7 +1539,7 @@ function handleKey(e) {
   }
 }
 
-function addMessage(role, content) {
+function addMessage(role, content, images) {
   const welcome = document.getElementById('welcome');
   if (welcome) welcome.remove();
 
@@ -1496,6 +1558,14 @@ function addMessage(role, content) {
     bubble.innerHTML = formatResponse(content);
   } else {
     bubble.textContent = content;
+    if (images && images.length > 0) {
+      images.forEach(img => {
+        const el = document.createElement('img');
+        el.src = img.previewUrl;
+        el.className = 'chat-image';
+        bubble.appendChild(el);
+      });
+    }
   }
 
   div.appendChild(avatar);
@@ -1552,10 +1622,27 @@ async function sendMessage() {
   sendBtn.disabled = true;
 
   const ctx = getSystemContext();
-  const userMessage = ctx ? `${text}\n\n${ctx}` : text;
+  const textWithCtx = ctx ? `${text}\n\n${ctx}` : text;
 
-  addMessage('user', text);
-  conversationHistory.push({ role: 'user', content: userMessage });
+  // Build message content (text + any images)
+  const imagesToSend = [...pendingImages];
+  let userContent;
+  if (imagesToSend.length > 0) {
+    userContent = [
+      ...imagesToSend.map(img => ({
+        type: 'image',
+        source: { type: 'base64', media_type: img.mediaType, data: img.base64 }
+      })),
+      { type: 'text', text: textWithCtx }
+    ];
+  } else {
+    userContent = textWithCtx;
+  }
+
+  addMessage('user', text, imagesToSend);
+  pendingImages = [];
+  renderImagePreviews();
+  conversationHistory.push({ role: 'user', content: userContent });
   showTyping();
 
   try {
