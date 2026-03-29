@@ -2603,7 +2603,7 @@ async function sendMessage() {
       conversationHistory.push({ role: 'assistant', content: reply });
       addMessage('assistant', reply);
     } else if (data.error) {
-      addMessage('assistant', `API error: ${data.error.message}. Double-check your API key in the bar at the top.`);
+      addMessage('assistant', 'Error: ' + (typeof data.error === 'object' ? (data.error.message || JSON.stringify(data.error)) : data.error));
     } else {
       addMessage('assistant', 'Something went wrong. Check your API key and try again.');
     }
