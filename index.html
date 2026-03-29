@@ -835,6 +835,110 @@
   }
   .logout-btn:hover { border-color: var(--warn); color: var(--warn); }
 
+  /* Usage counter */
+  .usage-pill {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: default;
+  }
+  .usage-pill.warning { border-color: rgba(255,193,7,0.4); color: #ffc107; }
+  .usage-pill.critical { border-color: rgba(255,107,53,0.4); color: var(--warn); }
+  .usage-pill.pro { border-color: rgba(0,212,255,0.3); color: var(--accent); }
+
+  /* Upgrade Modal */
+  .upgrade-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.82);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .upgrade-modal {
+    background: var(--surface);
+    border: 1px solid rgba(0,212,255,0.25);
+    border-radius: 16px;
+    padding: 36px 32px;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    text-align: center;
+  }
+  .upgrade-modal .um-icon { font-size: 44px; margin-bottom: 16px; }
+  .upgrade-modal h2 {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .upgrade-modal p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+  .upgrade-features {
+    text-align: left;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 24px;
+  }
+  .upgrade-features .uf-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text);
+    padding: 5px 0;
+  }
+  .upgrade-features .uf-item::before { content: "⚡"; font-size: 12px; }
+  .upgrade-price {
+    font-family: var(--display);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .upgrade-price span { font-size: 14px; color: var(--muted); font-weight: 400; }
+  .upgrade-btn {
+    width: 100%;
+    background: var(--accent);
+    border: none;
+    color: #000;
+    font-family: var(--display);
+    font-size: 14px;
+    font-weight: 700;
+    padding: 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    margin-top: 16px;
+    transition: background 0.15s;
+  }
+  .upgrade-btn:hover { background: var(--accent2); }
+  .upgrade-dismiss {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    background: none;
+    border: none;
+    text-decoration: underline;
+  }
+  .upgrade-dismiss:hover { color: var(--text); }
+
   /* Pro Gate Modal */
   .pro-modal-backdrop {
     position: fixed;
@@ -942,6 +1046,7 @@
     <span class="beta-badge">BETA</span>
     <span class="api-status"><span class="status-dot"></span>AI Ready</span>
     <div id="authHeaderArea" style="display:none; align-items:center; gap:10px;">
+      <div id="usagePill" class="usage-pill" style="display:none;"></div>
       <span class="user-badge"><span class="ub-dot"></span><span id="userEmailDisplay"></span></span>
       <button class="logout-btn" onclick="signOut()">SIGN OUT</button>
     </div>
@@ -1839,6 +1944,7 @@ function onAuthSuccess(user) {
   const display = user.email.split('@')[0] + '@�';
   document.getElementById('userEmailDisplay').textContent = display;
   document.getElementById('authHeaderArea').style.display = 'flex';
+  loadUsageInfo();
 }
 
 async function signOut() {
@@ -2486,6 +2592,62 @@ function removeTyping() {
 }
 
 // -- Pro Gate --------------------------------------------------
+// ── Usage & Upgrade ───────────────────────────────────────────
+function updateUsagePill(usageInfo) {
+  const pill = document.getElementById('usagePill');
+  if (!pill) return;
+  if (usageInfo.plan === 'pro') {
+    pill.className = 'usage-pill pro';
+    pill.textContent = '⚡ PRO';
+    pill.style.display = 'flex';
+    return;
+  }
+  const used = usageInfo.messages_used || 0;
+  const limit = usageInfo.limit || 10;
+  const remaining = limit - used;
+  pill.style.display = 'flex';
+  if (remaining <= 2) {
+    pill.className = 'usage-pill critical';
+    pill.innerHTML = `🔥 ${remaining} msg${remaining !== 1 ? 's' : ''} left`;
+  } else if (remaining <= 5) {
+    pill.className = 'usage-pill warning';
+    pill.innerHTML = `⚠ ${remaining} msgs left`;
+  } else {
+    pill.className = 'usage-pill';
+    pill.innerHTML = `${used}/${limit} msgs`;
+  }
+}
+
+async function loadUsageInfo() {
+  if (!sbClient || !currentUser) return;
+  const { data: profile } = await sbClient
+    .from('profiles')
+    .select('plan, messages_used')
+    .eq('id', currentUser.id)
+    .single();
+  if (profile) {
+    updateUsagePill({
+      plan: profile.plan,
+      messages_used: profile.messages_used,
+      limit: profile.plan === 'free' ? 10 : null
+    });
+  }
+}
+
+function showUpgradeModal() {
+  document.getElementById('upgradeBackdrop').style.display = 'flex';
+}
+
+function closeUpgrade() {
+  document.getElementById('upgradeBackdrop').style.display = 'none';
+}
+
+function goToPro() {
+  // Stripe integration comes next — for now show a coming soon
+  alert('Stripe checkout coming very soon! Email joe@fieldmind.net to get Pro access now.');
+}
+// ─────────────────────────────────────────────────────────────
+
 function isProUnlocked() {
   return !!localStorage.getItem('fm_pro_email');
 }
@@ -2596,25 +2758,43 @@ async function sendMessage() {
   showTyping();
 
   try {
+    // Get current session token
+    const { data: { session } } = await sbClient.auth.getSession();
+    const token = session ? session.access_token : '';
+
     const response = await fetch('/.netlify/functions/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify({
         system: SYSTEM_PROMPTS[currentMode],
         messages: conversationHistory
       })
     });
+
     const data = await response.json();
     removeTyping();
+
+    // Handle usage limit
+    if (response.status === 402 || data.error === 'limit_reached') {
+      showUpgradeModal();
+      isLoading = false;
+      sendBtn.disabled = false;
+      return;
+    }
 
     if (data.content && data.content[0]) {
       const reply = data.content[0].text;
       conversationHistory.push({ role: 'assistant', content: reply });
       addMessage('assistant', reply);
+      // Update usage pill
+      if (data.usage_info) updateUsagePill(data.usage_info);
     } else if (data.error) {
-      addMessage('assistant', `API error: ${data.error.message}. Double-check your API key in the bar at the top.`);
+      addMessage('assistant', `Error: ${data.error}. Please try again.`);
     } else {
-      addMessage('assistant', 'Something went wrong. Check your API key and try again.');
+      addMessage('assistant', 'Something went wrong. Please try again.');
     }
   } catch (err) {
     removeTyping();
@@ -2626,6 +2806,25 @@ async function sendMessage() {
   input.focus();
 }
 </script>
+
+<!-- Upgrade Modal -->
+<div id="upgradeBackdrop" class="upgrade-backdrop">
+  <div class="upgrade-modal">
+    <div class="um-icon">🚀</div>
+    <h2>You've hit the free limit</h2>
+    <p>You've used all <strong>10 free messages</strong> this month. Upgrade to Pro for unlimited access and advanced features.</p>
+    <div class="upgrade-features">
+      <div class="uf-item">Unlimited AI messages</div>
+      <div class="uf-item">Pro gauge & voltage fields</div>
+      <div class="uf-item">Photo & image analysis</div>
+      <div class="uf-item">Saved conversation history</div>
+      <div class="uf-item">Job report exports</div>
+    </div>
+    <div class="upgrade-price">$12<span>/month &nbsp;·&nbsp; or $99/year</span></div>
+    <button class="upgrade-btn" onclick="goToPro()">UPGRADE TO PRO →</button>
+    <button class="upgrade-dismiss" onclick="closeUpgrade()">Maybe later</button>
+  </div>
+</div>
 
 <!-- Auth Modal -->
 <div id="authBackdrop" class="auth-backdrop">
@@ -2700,4 +2899,5 @@ async function sendMessage() {
 
 </body>
 </html>
+
 
