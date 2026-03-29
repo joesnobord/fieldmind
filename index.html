@@ -1794,7 +1794,7 @@ async function doSignIn() {
   const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
   btn.disabled = false; btn.textContent = 'SIGN IN →';
   if (error) { showAuthError('signinError', error.message); return; }
-  onAuthSuccess(data.user);
+  onAuthSuccess(data.user, data.session);
 }
 
 async function doSignUp() {
@@ -1812,8 +1812,8 @@ async function doSignUp() {
   btn.disabled = false; btn.textContent = 'CREATE ACCOUNT →';
   if (error) { showAuthError('signupError', error.message); return; }
   if (data.user && data.session) {
-    // Auto-confirmed (email confirm disabled in Supabase)
-    onAuthSuccess(data.user);
+    // Auto-confirmed
+    onAuthSuccess(data.user, data.session);
   } else {
     showAuthSuccess('signupSuccess', '✓ Account created! Check your email to confirm your address, then sign in.');
   }
