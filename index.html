@@ -2181,6 +2181,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lockEl) lockEl.style.display = 'none';
     if (fieldsEl) fieldsEl.style.display = 'block';
   }
+  // Handle post-Stripe redirect
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('upgraded') === 'true') {
+    // Clean URL and show success once logged in
+    window.history.replaceState({}, '', '/');
+    setTimeout(() => {
+      if (currentUser) {
+        loadUsageInfo();
+        const pill = document.getElementById('usagePill');
+        if (pill) { pill.className = 'usage-pill pro'; pill.textContent = '⚡ PRO'; pill.style.display = 'flex'; }
+      }
+    }, 2000);
+  }
+
   // Init Supabase + auth
   try {
     sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -2664,9 +2678,30 @@ function closeUpgrade() {
   document.getElementById('upgradeBackdrop').style.display = 'none';
 }
 
-function goToPro() {
-  // Stripe integration comes next — for now show a coming soon
-  alert('Stripe checkout coming very soon! Email joe@fieldmind.net to get Pro access now.');
+async function goToPro() {
+  const btn = document.querySelector('.upgrade-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Loading…'; }
+  try {
+    const { data: { session } } = await sbClient.auth.getSession();
+    const token = session ? session.access_token : '';
+    const response = await fetch('/.netlify/functions/create-checkout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    const data = await response.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert('Could not start checkout: ' + (data.error || 'Unknown error'));
+      if (btn) { btn.disabled = false; btn.textContent = 'UPGRADE TO PRO →'; }
+    }
+  } catch (err) {
+    alert('Checkout error: ' + err.message);
+    if (btn) { btn.disabled = false; btn.textContent = 'UPGRADE TO PRO →'; }
+  }
 }
 // ─────────────────────────────────────────────────────────────
 
