@@ -1816,7 +1816,7 @@ async function doSignUp() {
     // Auto-confirmed (email confirm disabled in Supabase)
     onAuthSuccess(data.user);
   } else {
-    showAuthSuccess('signupSuccess', '? Account created! Check your email to confirm your address, then sign in.');
+    window.location.href = '/confirm.html?email=' + encodeURIComponent(email);
   }
 }
 
@@ -2700,3 +2700,4 @@ async function sendMessage() {
 
 </body>
 </html>
+

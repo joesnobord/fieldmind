@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Check Your Email — FieldMind</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2335;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --accent: #00d4ff;
+    --accent2: #0099bb;
+    --good: #00c896;
+    --text: #e8eaf0;
+    --muted: #7a8099;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'Inter', sans-serif;
+    --display: 'Syne', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .logo {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); display: inline-block; }
+
+  .page {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid rgba(0,200,150,0.25);
+    border-radius: 20px;
+    padding: 48px 40px;
+    max-width: 460px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  .icon {
+    font-size: 56px;
+    margin-bottom: 20px;
+    display: block;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  h1 {
+    font-family: var(--display);
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  .sub {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+  .sub strong { color: var(--text); }
+  .steps {
+    text-align: left;
+    margin-bottom: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--surface2);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  .step-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-text {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .step-text span { color: var(--muted); font-size: 12px; display: block; margin-top: 2px; }
+  .back-btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #000;
+    font-family: var(--display);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 12px 28px;
+    border-radius: 8px;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: background 0.15s;
+  }
+  .back-btn:hover { background: var(--accent2); }
+  .resend {
+    margin-top: 16px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .resend a {
+    color: var(--accent);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .resend a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="logo-dot"></span>FieldMind</div>
+</header>
+
+<div class="page">
+  <div class="card">
+    <span class="icon">📬</span>
+    <h1>Check your inbox</h1>
+    <p class="sub">We sent a confirmation link to <strong id="emailDisplay">your email</strong>. Click it to activate your account and get started.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">Open your email inbox<span>Look for a message from FieldMind</span></div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">Click "Confirm your email"<span>The link will activate your account</span></div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">Come back and sign in<span>You're ready to go</span></div>
+      </div>
+    </div>
+
+    <a href="/" class="back-btn">← Back to Sign In</a>
+    <div class="resend">Didn't get it? Check spam, or <a onclick="resendEmail()">resend the email</a>.</div>
+  </div>
+</div>
+
+<script src="/supabase.js"></script>
+<script>
+  const SUPABASE_URL = 'https://apheessofosikxekaqov.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_-nAVqFP2M5lvOfFUbMeIPg_lND58jYT';
+  const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Show the email address if passed via URL param
+  const params = new URLSearchParams(window.location.search);
+  const email = params.get('email');
+  if (email) document.getElementById('emailDisplay').textContent = email;
+
+  async function resendEmail() {
+    if (!email) { alert('No email address found. Please go back and sign up again.'); return; }
+    const { error } = await sbClient.auth.resend({ type: 'signup', email });
+    if (error) { alert('Could not resend: ' + error.message); }
+    else { alert('Confirmation email resent! Check your inbox.'); }
+  }
+</script>
+</body>
+</html>
