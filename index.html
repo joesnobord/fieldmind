@@ -1749,6 +1749,7 @@ let sbClient = null;
 
 let currentUser = null;
 let currentSession = null;
+let userPlan = 'free';
 
 function switchAuthTab(tab) {
   document.getElementById('authSignInForm').style.display = 'none';
@@ -2393,7 +2394,7 @@ function getSystemContext() {
   if (outdoorRunning)          ctx += `Outdoor unit status: ${outdoorRunning}. `;
   if (outdoorBrand)            ctx += `Brand/model: ${outdoorBrand}. `;
   if (outdoorChecks.length>0)  ctx += `Visual observations on outdoor unit: ${outdoorChecks.join(', ')}. `;
-  if (isProUnlocked()) {
+  if (userPlan === 'pro') {
     const suction = document.getElementById('suctionPressure')?.value;
     const head = document.getElementById('headPressure')?.value;
     const superheatVal = document.getElementById('superheat')?.value;
@@ -2501,7 +2502,7 @@ function removeTyping() {
 
 // ── Pro Gate ──────────────────────────────────────────────────
 function isProUnlocked() {
-  return !!localStorage.getItem('fm_pro_email');
+  return userPlan === 'pro';
 }
 
 function detectProContent(text) {
@@ -2519,10 +2520,8 @@ function detectProContent(text) {
 }
 
 function showProGate() {
-  document.getElementById('proGateBackdrop').style.display = 'flex';
-  document.getElementById('proEmailInput').value = '';
-  document.getElementById('proGateForm').style.display = 'block';
-  document.getElementById('proGateSuccess').style.display = 'none';
+  // Show the upgrade modal instead of the old email gate
+  showUpgradeModal();
 }
 
 function hideProGate() {
@@ -2574,13 +2573,11 @@ async function sendMessage() {
   isLoading = true;
   sendBtn.disabled = true;
 
-  // Pro gate: intercept if pro content detected and not unlocked
-  if (detectProContent(text) && !isProUnlocked()) {
-    pendingProMessage = text;
-    showProGate();
+  // Pro gate: intercept if pro content detected and not pro user
+  if (detectProContent(text) && userPlan !== 'pro') {
+    showUpgradeModal();
     isLoading = false;
     sendBtn.disabled = false;
-    input.value = text;
     return;
   }
 
