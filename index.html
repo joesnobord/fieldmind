@@ -1779,7 +1779,7 @@
       <div class="input-wrap">
         <textarea id="userInput" rows="1" placeholder="Describe the symptom, system, or job situation..." oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
         <div class="input-actions">
-          <button class="upload-btn" title="Upload a photo">
+          <button class="upload-btn" id="uploadBtn" title="Upload a photo (Pro only)" onclick="if(userPlan!=='pro'){showUpgradeModal();return false;}">
             📷
             <input type="file" accept="image/*" multiple onchange="handleImageUpload(this)">
           </button>
@@ -2002,6 +2002,11 @@ let pendingImages = []; // {base64, mediaType, previewUrl}
 let pendingProMessage = null;
 
 function handleImageUpload(input) {
+  if (userPlan !== 'pro') {
+    input.value = '';
+    showUpgradeModal();
+    return;
+  }
   const files = Array.from(input.files);
   files.forEach(file => {
     if (!file.type.startsWith('image/')) return;
@@ -2746,6 +2751,8 @@ async function sendMessage() {
   const textWithCtx = ctx ? `${text}\n\n${ctx}` : text;
 
   // Build message content (text + any images)
+  // Strip images for free users
+  if (userPlan !== 'pro') pendingImages = [];
   const imagesToSend = [...pendingImages];
   let userContent;
   if (imagesToSend.length > 0) {
