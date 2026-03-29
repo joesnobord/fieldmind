@@ -979,6 +979,7 @@
     <span class="beta-badge">BETA</span>
     <span class="api-status"><span class="status-dot"></span>AI Ready</span>
     <div id="authHeaderArea" style="display:none; align-items:center; gap:10px;">
+      <div id="usagePill" class="usage-pill" style="display:none;"></div>
       <span class="user-badge"><span class="ub-dot"></span><span id="userEmailDisplay"></span></span>
       <button class="logout-btn" onclick="signOut()">SIGN OUT</button>
     </div>
@@ -2540,6 +2541,31 @@ function removeTyping() {
 
 // ── Pro Gate ──────────────────────────────────────────────────
 // ── Upgrade ──────────────────────────────────────────────────
+function updateUsagePill(usageInfo) {
+  const pill = document.getElementById('usagePill');
+  if (!pill) return;
+  if (usageInfo.plan === 'pro') {
+    pill.className = 'usage-pill pro';
+    pill.textContent = '⚡ PRO';
+    pill.style.display = 'flex';
+    return;
+  }
+  const used = usageInfo.messages_used || 0;
+  const limit = usageInfo.limit || 10;
+  const remaining = limit - used;
+  pill.style.display = 'flex';
+  if (remaining <= 2) {
+    pill.className = 'usage-pill critical';
+    pill.innerHTML = '🔥 ' + remaining + ' msg' + (remaining !== 1 ? 's' : '') + ' left';
+  } else if (remaining <= 5) {
+    pill.className = 'usage-pill warning';
+    pill.innerHTML = '⚠ ' + remaining + ' msgs left';
+  } else {
+    pill.className = 'usage-pill';
+    pill.innerHTML = used + '/' + limit + ' msgs';
+  }
+}
+
 async function loadUsageInfo() {
   if (!currentSession) return;
   try {
