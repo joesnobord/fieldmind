@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FieldMind — AI-Driven HVAC Expert</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --bg: #0f1117;
@@ -672,6 +673,168 @@
     .messages { padding: 16px; }
   }
 
+  /* Auth Modal */
+  .auth-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.88);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .auth-modal {
+    background: var(--surface);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 16px;
+    padding: 36px 32px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+  }
+  .auth-logo {
+    font-family: var(--display);
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .auth-tagline {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+  .auth-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 4px;
+  }
+  .auth-tab {
+    flex: 1;
+    font-family: var(--display);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background: transparent;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    transition: all 0.15s;
+  }
+  .auth-tab.active { background: var(--accent); color: #000; }
+  .auth-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    outline: none;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    transition: border-color 0.15s;
+  }
+  .auth-input:focus { border-color: var(--accent); }
+  .auth-input.error { border-color: var(--warn); }
+  .auth-btn {
+    width: 100%;
+    background: var(--accent);
+    border: none;
+    color: #000;
+    font-family: var(--display);
+    font-size: 14px;
+    font-weight: 700;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: background 0.15s;
+    margin-top: 4px;
+  }
+  .auth-btn:hover { background: var(--accent2); }
+  .auth-btn:disabled { background: var(--border2); cursor: not-allowed; color: var(--muted); }
+  .auth-error {
+    font-size: 12px;
+    color: var(--warn);
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    background: rgba(255,107,53,0.1);
+    border: 1px solid rgba(255,107,53,0.25);
+    border-radius: 6px;
+    display: none;
+  }
+  .auth-success {
+    font-size: 12px;
+    color: var(--good);
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    background: rgba(0,200,150,0.1);
+    border: 1px solid rgba(0,200,150,0.25);
+    border-radius: 6px;
+    display: none;
+    line-height: 1.5;
+  }
+  .auth-footer {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+  .auth-divider {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    margin: 14px 0;
+    position: relative;
+  }
+  .auth-divider::before, .auth-divider::after {
+    content: '';
+    display: inline-block;
+    width: 38%;
+    height: 1px;
+    background: var(--border);
+    vertical-align: middle;
+    margin: 0 8px;
+  }
+  /* User badge in header */
+  .user-badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--good);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .user-badge .ub-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--good); }
+  .logout-btn {
+    background: transparent;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.15s;
+  }
+  .logout-btn:hover { border-color: var(--warn); color: var(--warn); }
+
   /* Pro Gate Modal */
   .pro-modal-backdrop {
     position: fixed;
@@ -778,6 +941,10 @@
   <div class="header-right">
     <span class="beta-badge">BETA</span>
     <span class="api-status"><span class="status-dot"></span>AI Ready</span>
+    <div id="authHeaderArea" style="display:none; align-items:center; gap:10px;">
+      <span class="user-badge"><span class="ub-dot"></span><span id="userEmailDisplay"></span></span>
+      <button class="logout-btn" onclick="signOut()">SIGN OUT</button>
+    </div>
   </div>
 </header>
 
@@ -1575,6 +1742,129 @@
 </div>
 
 <script>
+// ── Supabase Auth ──────────────────────────────────────────────
+const SUPABASE_URL = 'https://apheessofosikxekaqov.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_-nAVqFP2M5lvOfFUbMeIPg_lND58jYT';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
+
+function switchAuthTab(tab) {
+  document.getElementById('authSignInForm').style.display = 'none';
+  document.getElementById('authSignUpForm').style.display = 'none';
+  document.getElementById('authForgotForm').style.display = 'none';
+  document.getElementById('tabSignIn').classList.remove('active');
+  document.getElementById('tabSignUp').classList.remove('active');
+  if (tab === 'signin') {
+    document.getElementById('authSignInForm').style.display = 'block';
+    document.getElementById('tabSignIn').classList.add('active');
+  } else if (tab === 'signup') {
+    document.getElementById('authSignUpForm').style.display = 'block';
+    document.getElementById('tabSignUp').classList.add('active');
+  } else if (tab === 'forgot') {
+    document.getElementById('authForgotForm').style.display = 'block';
+  }
+  // Clear errors
+  ['signinError','signinSuccess','signupError','signupSuccess','forgotError','forgotSuccess'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style.display = 'none'; el.textContent = ''; }
+  });
+}
+
+function showAuthError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function showAuthSuccess(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+async function doSignIn() {
+  const email = document.getElementById('signinEmail').value.trim();
+  const password = document.getElementById('signinPassword').value;
+  document.getElementById('signinError').style.display = 'none';
+  document.getElementById('signinSuccess').style.display = 'none';
+  if (!email || !password) { showAuthError('signinError', 'Please enter your email and password.'); return; }
+  const btn = document.getElementById('signinBtn');
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  btn.disabled = false; btn.textContent = 'SIGN IN →';
+  if (error) { showAuthError('signinError', error.message); return; }
+  onAuthSuccess(data.user);
+}
+
+async function doSignUp() {
+  const email = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
+  const password2 = document.getElementById('signupPassword2').value;
+  document.getElementById('signupError').style.display = 'none';
+  document.getElementById('signupSuccess').style.display = 'none';
+  if (!email || !password) { showAuthError('signupError', 'Please fill in all fields.'); return; }
+  if (password.length < 8) { showAuthError('signupError', 'Password must be at least 8 characters.'); return; }
+  if (password !== password2) { showAuthError('signupError', 'Passwords don\'t match.'); return; }
+  const btn = document.getElementById('signupBtn');
+  btn.disabled = true; btn.textContent = 'Creating account…';
+  const { data, error } = await supabase.auth.signUp({ email, password });
+  btn.disabled = false; btn.textContent = 'CREATE ACCOUNT →';
+  if (error) { showAuthError('signupError', error.message); return; }
+  if (data.user && data.session) {
+    // Auto-confirmed (email confirm disabled in Supabase)
+    onAuthSuccess(data.user);
+  } else {
+    showAuthSuccess('signupSuccess', '✓ Account created! Check your email to confirm your address, then sign in.');
+  }
+}
+
+async function doForgot() {
+  const email = document.getElementById('forgotEmail').value.trim();
+  document.getElementById('forgotError').style.display = 'none';
+  document.getElementById('forgotSuccess').style.display = 'none';
+  if (!email) { showAuthError('forgotError', 'Please enter your email address.'); return; }
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin
+  });
+  if (error) { showAuthError('forgotError', error.message); return; }
+  showAuthSuccess('forgotSuccess', '✓ Password reset link sent! Check your inbox.');
+}
+
+function onAuthSuccess(user) {
+  currentUser = user;
+  document.getElementById('authBackdrop').style.display = 'none';
+  // Show user in header
+  const display = user.email.split('@')[0] + '@…';
+  document.getElementById('userEmailDisplay').textContent = display;
+  document.getElementById('authHeaderArea').style.display = 'flex';
+}
+
+async function signOut() {
+  await supabase.auth.signOut();
+  currentUser = null;
+  document.getElementById('authHeaderArea').style.display = 'none';
+  document.getElementById('authBackdrop').style.display = 'flex';
+  switchAuthTab('signin');
+  clearChat();
+}
+
+// Check existing session on load
+async function initAuth() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session && session.user) {
+    onAuthSuccess(session.user);
+  } else {
+    document.getElementById('authBackdrop').style.display = 'flex';
+  }
+  // Listen for auth changes (e.g. password reset redirect)
+  supabase.auth.onAuthStateChange((_event, session) => {
+    if (session && session.user && !currentUser) {
+      onAuthSuccess(session.user);
+    }
+  });
+}
+// ────────────────────────────────────────────────────────────────
+
 const SYSTEM_PROMPTS = {
   diagnose: `You are FieldMind, an AI HVAC diagnostic assistant built by an experienced HVAC installer and technician with decades of real-world field experience installing and troubleshooting split systems, heat pumps, package units, mini-splits, gas furnaces, and boilers.
 
@@ -1780,6 +2070,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lockEl) lockEl.style.display = 'none';
     if (fieldsEl) fieldsEl.style.display = 'block';
   }
+  // Init auth (hides/shows auth gate based on session)
+  initAuth();
 });
 
 
@@ -2243,6 +2535,10 @@ function submitProGate() {
 
 async function sendMessage() {
   if (isLoading) return;
+  if (!currentUser) {
+    document.getElementById('authBackdrop').style.display = 'flex';
+    return;
+  }
   const input = document.getElementById('userInput');
   const text = input.value.trim();
   if (!text) return;
@@ -2319,6 +2615,51 @@ async function sendMessage() {
   input.focus();
 }
 </script>
+
+<!-- Auth Modal -->
+<div id="authBackdrop" class="auth-backdrop">
+  <div class="auth-modal">
+    <div class="auth-logo"><span class="logo-dot"></span>FieldMind</div>
+    <div class="auth-tagline">AI-powered HVAC diagnostics. Sign in to get started — free during beta.</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabSignIn" onclick="switchAuthTab('signin')">SIGN IN</button>
+      <button class="auth-tab" id="tabSignUp" onclick="switchAuthTab('signup')">CREATE ACCOUNT</button>
+    </div>
+
+    <!-- Sign In Form -->
+    <div id="authSignInForm">
+      <div class="auth-error" id="signinError"></div>
+      <div class="auth-success" id="signinSuccess"></div>
+      <input class="auth-input" type="email" id="signinEmail" placeholder="Email address" autocomplete="email">
+      <input class="auth-input" type="password" id="signinPassword" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doSignIn()">
+      <button class="auth-btn" id="signinBtn" onclick="doSignIn()">SIGN IN →</button>
+      <div class="auth-divider">or</div>
+      <button class="auth-btn" style="background:var(--surface2); color:var(--text); border:1px solid var(--border2);" onclick="switchAuthTab('forgot')">Forgot password?</button>
+    </div>
+
+    <!-- Sign Up Form -->
+    <div id="authSignUpForm" style="display:none;">
+      <div class="auth-error" id="signupError"></div>
+      <div class="auth-success" id="signupSuccess"></div>
+      <input class="auth-input" type="email" id="signupEmail" placeholder="Email address" autocomplete="email">
+      <input class="auth-input" type="password" id="signupPassword" placeholder="Password (8+ characters)" autocomplete="new-password">
+      <input class="auth-input" type="password" id="signupPassword2" placeholder="Confirm password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doSignUp()">
+      <button class="auth-btn" id="signupBtn" onclick="doSignUp()">CREATE ACCOUNT →</button>
+    </div>
+
+    <!-- Forgot Password Form -->
+    <div id="authForgotForm" style="display:none;">
+      <div class="auth-error" id="forgotError"></div>
+      <div class="auth-success" id="forgotSuccess"></div>
+      <input class="auth-input" type="email" id="forgotEmail" placeholder="Your email address" autocomplete="email" onkeydown="if(event.key==='Enter')doForgot()">
+      <button class="auth-btn" onclick="doForgot()">SEND RESET LINK →</button>
+      <div class="auth-divider">or</div>
+      <button class="auth-btn" style="background:var(--surface2); color:var(--text); border:1px solid var(--border2);" onclick="switchAuthTab('signin')">← Back to Sign In</button>
+    </div>
+
+    <div class="auth-footer">Free during beta &nbsp;·&nbsp; No credit card needed &nbsp;·&nbsp; HVAC professionals & homeowners welcome</div>
+  </div>
+</div>
 
 <!-- Pro Gate Modal -->
 <div id="proGateBackdrop" class="pro-modal-backdrop" style="display:none;">
