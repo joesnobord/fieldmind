@@ -1833,7 +1833,10 @@ async function doForgot() {
 
 function onAuthSuccess(user, session) {
   currentUser = user;
-  if (session) currentSession = session;
+  if (session) {
+    currentSession = session;
+    try { sessionStorage.setItem('fm_token', session.access_token); } catch(e) {}
+  }
   document.getElementById('authBackdrop').style.display = 'none';
   // Show user in header
   const display = user.email.split('@')[0] + '@…';
@@ -1842,6 +1845,7 @@ function onAuthSuccess(user, session) {
 }
 
 async function signOut() {
+  try { sessionStorage.removeItem('fm_token'); } catch(e) {}
   await sbClient.auth.signOut();
   currentUser = null;
   document.getElementById('authHeaderArea').style.display = 'none';
@@ -1857,7 +1861,22 @@ async function initAuth() {
     currentSession = session;
     onAuthSuccess(session.user, session);
   } else {
-    document.getElementById('authBackdrop').style.display = 'flex';
+    // Try sessionStorage fallback (Edge tracking prevention blocks localStorage)
+    const savedToken = (function(){ try { return sessionStorage.getItem('fm_token'); } catch(e) { return null; } })();
+    if (savedToken) {
+      // Verify the token is still valid
+      sbClient.auth.getUser(savedToken).then(({ data }) => {
+        if (data && data.user) {
+          currentSession = { access_token: savedToken };
+          onAuthSuccess(data.user, currentSession);
+        } else {
+          try { sessionStorage.removeItem('fm_token'); } catch(e) {}
+          document.getElementById('authBackdrop').style.display = 'flex';
+        }
+      });
+    } else {
+      document.getElementById('authBackdrop').style.display = 'flex';
+    }
   }
   // Listen for auth changes (e.g. password reset redirect)
   sbClient.auth.onAuthStateChange((_event, session) => {
@@ -2591,7 +2610,7 @@ async function sendMessage() {
   showTyping();
 
   try {
-    const chatToken = currentSession ? currentSession.access_token : '';
+    const chatToken = (currentSession && currentSession.access_token) || (function(){ try { return sessionStorage.getItem('fm_token') || ''; } catch(e) { return ''; } })();
     const response = await fetch('/.netlify/functions/chat', {
       method: 'POST',
       headers: {
