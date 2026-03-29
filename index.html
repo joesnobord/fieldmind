@@ -1748,6 +1748,7 @@ const SUPABASE_ANON_KEY = 'sb_publishable_-nAVqFP2M5lvOfFUbMeIPg_lND58jYT';
 let sbClient = null;
 
 let currentUser = null;
+let currentSession = null;
 
 function switchAuthTab(tab) {
   document.getElementById('authSignInForm').style.display = 'none';
@@ -1830,8 +1831,9 @@ async function doForgot() {
   showAuthSuccess('forgotSuccess', '✓ Password reset link sent! Check your inbox.');
 }
 
-function onAuthSuccess(user) {
+function onAuthSuccess(user, session) {
   currentUser = user;
+  if (session) currentSession = session;
   document.getElementById('authBackdrop').style.display = 'none';
   // Show user in header
   const display = user.email.split('@')[0] + '@…';
@@ -1852,14 +1854,16 @@ async function signOut() {
 async function initAuth() {
   const { data: { session } } = await sbClient.auth.getSession();
   if (session && session.user) {
-    onAuthSuccess(session.user);
+    currentSession = session;
+    onAuthSuccess(session.user, session);
   } else {
     document.getElementById('authBackdrop').style.display = 'flex';
   }
   // Listen for auth changes (e.g. password reset redirect)
   sbClient.auth.onAuthStateChange((_event, session) => {
     if (session && session.user && !currentUser) {
-      onAuthSuccess(session.user);
+      currentSession = session;
+      onAuthSuccess(session.user, session);
     }
   });
 }
@@ -2587,8 +2591,7 @@ async function sendMessage() {
   showTyping();
 
   try {
-    const { data: { session: chatSession } } = await sbClient.auth.getSession();
-    const chatToken = chatSession ? chatSession.access_token : '';
+    const chatToken = currentSession ? currentSession.access_token : '';
     const response = await fetch('/.netlify/functions/chat', {
       method: 'POST',
       headers: {
