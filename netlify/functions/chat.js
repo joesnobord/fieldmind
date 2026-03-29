@@ -2,11 +2,6 @@ const { createClient } = require('@supabase/supabase-js');
 
 const FREE_LIMIT = 10;
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY  // service role key — bypasses RLS
-);
-
 exports.handler = async function(event) {
   if (event.httpMethod === 'OPTIONS') {
     return {
@@ -24,37 +19,48 @@ exports.handler = async function(event) {
     return { statusCode: 405, body: 'Method not allowed' };
   }
 
+  const CORS = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*'
+  };
+
   try {
+    // Check env vars up front with clear errors
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
+
+    if (!apiKey) return { statusCode: 500, headers: CORS, body: JSON.stringify({ error: 'Missing ANTHROPIC_API_KEY' }) };
+    if (!supabaseUrl) return { statusCode: 500, headers: CORS, body: JSON.stringify({ error: 'Missing SUPABASE_URL' }) };
+    if (!supabaseServiceKey) return { statusCode: 500, headers: CORS, body: JSON.stringify({ error: 'Missing SUPABASE_SERVICE_KEY' }) };
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
     const body = JSON.parse(event.body);
     const messages = body.messages;
     const systemPrompt = body.system;
+
+    if (!messages) return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Missing messages' }) };
+
+    // Verify auth token
     const authHeader = event.headers.authorization || '';
     const token = authHeader.replace('Bearer ', '');
+    if (!token) return { statusCode: 401, headers: CORS, body: JSON.stringify({ error: 'Not authenticated' }) };
 
-    if (!messages) {
-      return { statusCode: 400, body: JSON.stringify({ error: 'Missing messages' }) };
-    }
-
-    // ── Verify user + check usage ──────────────────────────────
-    if (!token) {
-      return { statusCode: 401, body: JSON.stringify({ error: 'Not authenticated' }) };
-    }
-
-    // Get user from JWT
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    if (authError || !user) {
-      return { statusCode: 401, body: JSON.stringify({ error: 'Invalid session' }) };
-    }
+    if (authError || !user) return { statusCode: 401, headers: CORS, body: JSON.stringify({ error: 'Invalid session: ' + (authError?.message || 'no user') }) };
 
-    // Get profile
-    const { data: profile, error: profileError } = await supabase
+    // Get or create profile
+    let { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('plan, messages_used, messages_reset_at')
       .eq('id', user.id)
       .single();
 
     if (profileError || !profile) {
-      return { statusCode: 500, body: JSON.stringify({ error: 'Profile not found' }) };
+      // Auto-create profile if missing
+      await supabase.from('profiles').insert({ id: user.id, email: user.email });
+      profile = { plan: 'free', messages_used: 0, messages_reset_at: new Date().toISOString() };
     }
 
     // Reset monthly counter if needed
@@ -65,31 +71,19 @@ exports.handler = async function(event) {
 
     if (resetAt < monthAgo) {
       messagesUsed = 0;
-      await supabase.from('profiles').update({
-        messages_used: 0,
-        messages_reset_at: now.toISOString()
-      }).eq('id', user.id);
+      await supabase.from('profiles').update({ messages_used: 0, messages_reset_at: now.toISOString() }).eq('id', user.id);
     }
 
-    // Check limit for free users
+    // Check free limit
     if (profile.plan === 'free' && messagesUsed >= FREE_LIMIT) {
       return {
         statusCode: 402,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-        body: JSON.stringify({
-          error: 'limit_reached',
-          messages_used: messagesUsed,
-          limit: FREE_LIMIT
-        })
+        headers: CORS,
+        body: JSON.stringify({ error: 'limit_reached', messages_used: messagesUsed, limit: FREE_LIMIT })
       };
     }
 
-    // ── Call Claude ────────────────────────────────────────────
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
-      return { statusCode: 500, body: JSON.stringify({ error: 'Server configuration error' }) };
-    }
-
+    // Call Claude
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -107,19 +101,13 @@ exports.handler = async function(event) {
 
     const data = await response.json();
 
-    // Increment usage on success
     if (data.content && data.content[0]) {
-      await supabase.from('profiles').update({
-        messages_used: messagesUsed + 1
-      }).eq('id', user.id);
+      await supabase.from('profiles').update({ messages_used: messagesUsed + 1 }).eq('id', user.id);
     }
 
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
+      headers: CORS,
       body: JSON.stringify({
         ...data,
         usage_info: {
@@ -133,6 +121,7 @@ exports.handler = async function(event) {
   } catch (err) {
     return {
       statusCode: 500,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
       body: JSON.stringify({ error: err.message })
     };
   }
