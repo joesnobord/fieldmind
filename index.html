@@ -835,6 +835,43 @@
   }
   .logout-btn:hover { border-color: var(--warn); color: var(--warn); }
 
+
+  /* Upgrade Modal */
+  .upgrade-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.82);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .upgrade-modal {
+    background: var(--surface);
+    border: 1px solid rgba(0,212,255,0.25);
+    border-radius: 16px;
+    padding: 36px 32px;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    text-align: center;
+  }
+  .upgrade-modal .um-icon { font-size: 44px; margin-bottom: 16px; }
+  .upgrade-modal h2 { font-family: var(--display); font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+  .upgrade-modal p { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+  .upgrade-features { text-align: left; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 24px; }
+  .upgrade-features .uf-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text); padding: 5px 0; }
+  .upgrade-features .uf-item::before { content: "⚡"; font-size: 12px; }
+  .upgrade-price { font-family: var(--display); font-size: 32px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+  .upgrade-price span { font-size: 14px; color: var(--muted); font-weight: 400; }
+  .upgrade-btn { width: 100%; background: var(--accent); border: none; color: #000; font-family: var(--display); font-size: 14px; font-weight: 700; padding: 14px; border-radius: 8px; cursor: pointer; letter-spacing: 0.5px; margin-top: 16px; transition: background 0.15s; }
+  .upgrade-btn:hover { background: var(--accent2); }
+  .upgrade-btn:disabled { background: var(--border2); cursor: not-allowed; }
+  .upgrade-dismiss { margin-top: 12px; font-size: 12px; color: var(--muted); cursor: pointer; background: none; border: none; text-decoration: underline; }
+  .upgrade-dismiss:hover { color: var(--text); }
+
   /* Pro Gate Modal */
   .pro-modal-backdrop {
     position: fixed;
@@ -2501,6 +2538,40 @@ function removeTyping() {
 }
 
 // ── Pro Gate ──────────────────────────────────────────────────
+// ── Upgrade ──────────────────────────────────────────────────
+function showUpgradeModal() {
+  const el = document.getElementById('upgradeBackdrop');
+  if (el) el.style.display = 'flex';
+}
+
+function closeUpgrade() {
+  const el = document.getElementById('upgradeBackdrop');
+  if (el) el.style.display = 'none';
+}
+
+async function goToPro() {
+  const btn = document.getElementById('upgradeBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Loading…'; }
+  try {
+    const chatToken = currentSession ? currentSession.access_token : '';
+    const response = await fetch('/.netlify/functions/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + chatToken }
+    });
+    const data = await response.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert('Could not start checkout: ' + (data.error || 'Unknown error'));
+      if (btn) { btn.disabled = false; btn.textContent = 'UPGRADE TO PRO →'; }
+    }
+  } catch (err) {
+    alert('Checkout error: ' + err.message);
+    if (btn) { btn.disabled = false; btn.textContent = 'UPGRADE TO PRO →'; }
+  }
+}
+// ─────────────────────────────────────────────────────────────
+
 function isProUnlocked() {
   return userPlan === 'pro';
 }
@@ -2684,6 +2755,25 @@ async function sendMessage() {
     </div>
 
     <div class="auth-footer">Free during beta &nbsp;·&nbsp; No credit card needed &nbsp;·&nbsp; HVAC professionals & homeowners welcome</div>
+  </div>
+</div>
+
+<!-- Upgrade Modal -->
+<div id="upgradeBackdrop" class="upgrade-backdrop">
+  <div class="upgrade-modal">
+    <div class="um-icon">🚀</div>
+    <h2>Upgrade to Pro</h2>
+    <p>You've hit a free tier limit. Upgrade to Pro for unlimited access and advanced features.</p>
+    <div class="upgrade-features">
+      <div class="uf-item">Unlimited AI messages</div>
+      <div class="uf-item">Pro gauge &amp; voltage fields</div>
+      <div class="uf-item">Photo &amp; image analysis</div>
+      <div class="uf-item">Saved conversation history</div>
+      <div class="uf-item">Job report exports</div>
+    </div>
+    <div class="upgrade-price">$12<span>/month &nbsp;·&nbsp; or $99/year</span></div>
+    <button class="upgrade-btn" id="upgradeBtn" onclick="goToPro()">UPGRADE TO PRO →</button>
+    <button class="upgrade-dismiss" onclick="closeUpgrade()">Maybe later</button>
   </div>
 </div>
 
