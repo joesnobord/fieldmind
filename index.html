@@ -1965,8 +1965,11 @@ async function initAuth() {
     document.getElementById('authBackdrop').style.display = 'flex';
   }
   // Listen for auth changes (e.g. password reset redirect)
-  sbClient.auth.onAuthStateChange((_event, session) => {
-    if (session && session.user && !currentUser) {
+  sbClient.auth.onAuthStateChange((event, session) => {
+    if (event === 'PASSWORD_RECOVERY') {
+      document.getElementById('authBackdrop').style.display = 'none';
+      document.getElementById('resetBackdrop').style.display = 'flex';
+    } else if (session && session.user && !currentUser) {
       onAuthSuccess(session.user);
     }
   });
@@ -2592,6 +2595,25 @@ function removeTyping() {
 }
 
 // -- Pro Gate --------------------------------------------------
+async function doResetPassword() {
+  const password = document.getElementById('resetPassword').value;
+  const password2 = document.getElementById('resetPassword2').value;
+  document.getElementById('resetError').style.display = 'none';
+  document.getElementById('resetSuccess').style.display = 'none';
+  if (password.length < 8) { showAuthError('resetError', 'Password must be at least 8 characters.'); return; }
+  if (password !== password2) { showAuthError('resetError', "Passwords don't match."); return; }
+  const btn = document.getElementById('resetBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  const { data, error } = await sbClient.auth.updateUser({ password });
+  btn.disabled = false; btn.textContent = 'SET NEW PASSWORD →';
+  if (error) { showAuthError('resetError', error.message); return; }
+  showAuthSuccess('resetSuccess', '✓ Password updated! Signing you in…');
+  setTimeout(() => {
+    document.getElementById('resetBackdrop').style.display = 'none';
+    onAuthSuccess(data.user);
+  }, 1500);
+}
+
 // ── Usage & Upgrade ───────────────────────────────────────────
 function updateUsagePill(usageInfo) {
   const pill = document.getElementById('usagePill');
@@ -2807,6 +2829,19 @@ async function sendMessage() {
 }
 </script>
 
+<!-- Password Reset Modal -->
+<div id="resetBackdrop" class="auth-backdrop" style="display:none;">
+  <div class="auth-modal">
+    <div class="auth-logo"><span class="logo-dot"></span>FieldMind</div>
+    <div class="auth-tagline">Set a new password for your account.</div>
+    <div class="auth-error" id="resetError"></div>
+    <div class="auth-success" id="resetSuccess"></div>
+    <input class="auth-input" type="password" id="resetPassword" placeholder="New password (8+ characters)" autocomplete="new-password">
+    <input class="auth-input" type="password" id="resetPassword2" placeholder="Confirm new password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doResetPassword()">
+    <button class="auth-btn" id="resetBtn" onclick="doResetPassword()">SET NEW PASSWORD →</button>
+  </div>
+</div>
+
 <!-- Upgrade Modal -->
 <div id="upgradeBackdrop" class="upgrade-backdrop">
   <div class="upgrade-modal">
@@ -2899,5 +2934,6 @@ async function sendMessage() {
 
 </body>
 </html>
+
 
 
