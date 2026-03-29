@@ -1745,7 +1745,7 @@
 // ── Supabase Auth ──────────────────────────────────────────────
 const SUPABASE_URL = 'https://apheessofosikxekaqov.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_-nAVqFP2M5lvOfFUbMeIPg_lND58jYT';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let supabase = null;
 
 let currentUser = null;
 
@@ -1783,6 +1783,7 @@ function showAuthSuccess(id, msg) {
 }
 
 async function doSignIn() {
+  if (!supabase) { showAuthError('signinError', 'Auth not loaded — please refresh.'); return; }
   const email = document.getElementById('signinEmail').value.trim();
   const password = document.getElementById('signinPassword').value;
   document.getElementById('signinError').style.display = 'none';
@@ -1797,6 +1798,7 @@ async function doSignIn() {
 }
 
 async function doSignUp() {
+  if (!supabase) { showAuthError('signupError', 'Auth not loaded — please refresh.'); return; }
   const email = document.getElementById('signupEmail').value.trim();
   const password = document.getElementById('signupPassword').value;
   const password2 = document.getElementById('signupPassword2').value;
@@ -2070,8 +2072,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lockEl) lockEl.style.display = 'none';
     if (fieldsEl) fieldsEl.style.display = 'block';
   }
-  // Init auth (hides/shows auth gate based on session)
-  initAuth();
+  // Init Supabase + auth
+  try {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    initAuth();
+  } catch(e) {
+    console.error('Supabase init failed:', e);
+    // Fallback: show auth modal but log the error
+    document.getElementById('authBackdrop').style.display = 'flex';
+    showAuthError('signupError', 'Auth system failed to load. Please refresh the page.');
+    showAuthError('signinError', 'Auth system failed to load. Please refresh the page.');
+  }
 });
 
 
