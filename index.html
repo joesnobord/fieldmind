@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -671,6 +671,100 @@
     .welcome-grid { grid-template-columns: 1fr; }
     .messages { padding: 16px; }
   }
+
+  /* Pro Gate Modal */
+  .pro-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .pro-modal {
+    background: var(--surface);
+    border: 1px solid rgba(0,212,255,0.3);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 440px;
+    width: 100%;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .pro-modal h2 {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .pro-modal p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
+  .pro-modal ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px;
+  }
+  .pro-modal ul li {
+    font-size: 12px;
+    color: var(--text);
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pro-modal ul li::before {
+    content: "⚡";
+    font-size: 11px;
+  }
+  .pro-modal-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: transparent;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .pro-modal-close:hover { color: var(--text); border-color: var(--text); }
+  .pro-email-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    outline: none;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+  }
+  .pro-email-input:focus { border-color: var(--accent); }
+  .pro-unlock-btn {
+    width: 100%;
+    background: var(--accent);
+    border: none;
+    color: #000;
+    font-family: var(--display);
+    font-size: 14px;
+    font-weight: 700;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: background 0.15s;
+  }
+  .pro-unlock-btn:hover { background: var(--accent2); }
 </style>
 </head>
 <body>
@@ -988,6 +1082,53 @@
 
     </div>
 
+
+    <div class="sidebar-section" id="proSection">
+      <div class="sidebar-label" style="display:flex; align-items:center; gap:6px;">
+        PRO FIELDS
+        <span style="font-family:var(--mono); font-size:9px; background:rgba(0,212,255,0.15); color:var(--accent); border:1px solid rgba(0,212,255,0.3); padding:1px 6px; border-radius:3px; letter-spacing:1px;">PRO</span>
+      </div>
+
+      <div id="proLock" style="background:rgba(0,212,255,0.05); border:1px dashed rgba(0,212,255,0.2); border-radius:8px; padding:16px; text-align:center;">
+        <div style="font-size:20px; margin-bottom:8px;">&#x1F512;</div>
+        <div style="font-family:var(--display); font-size:12px; font-weight:600; color:var(--text); margin-bottom:4px;">HVAC Pro Fields</div>
+        <div style="font-size:11px; color:var(--muted); margin-bottom:12px; line-height:1.5;">Gauge readings, voltage, amps &mdash; for techs with field data</div>
+        <button onclick="showProGate()" style="background:var(--accent); border:none; color:#000; font-family:var(--mono); font-size:11px; font-weight:600; padding:7px 16px; border-radius:6px; cursor:pointer; letter-spacing:0.5px; width:100%;">UNLOCK PRO &rarr;</button>
+        <div style="font-size:10px; color:var(--muted); margin-top:8px;">Free during beta</div>
+      </div>
+
+      <div id="proFields" style="display:none;">
+        <div class="field-group">
+          <label>Suction pressure (low side)</label>
+          <input type="text" id="suctionPressure" placeholder="e.g. 68 psig" oninput="updateLivePanel()">
+        </div>
+        <div class="field-group">
+          <label>Head pressure (high side)</label>
+          <input type="text" id="headPressure" placeholder="e.g. 250 psig" oninput="updateLivePanel()">
+        </div>
+        <div class="field-group">
+          <label>Superheat (&deg;F)</label>
+          <input type="text" id="superheat" placeholder="e.g. 12F" oninput="updateLivePanel()">
+        </div>
+        <div class="field-group">
+          <label>Subcooling (&deg;F)</label>
+          <input type="text" id="subcooling" placeholder="e.g. 10F" oninput="updateLivePanel()">
+        </div>
+        <div class="field-group">
+          <label>Supply voltage</label>
+          <input type="text" id="supplyVoltage" placeholder="e.g. 240v" oninput="updateLivePanel()">
+        </div>
+        <div class="field-group">
+          <label>Compressor amp draw</label>
+          <input type="text" id="compressorAmps" placeholder="e.g. 14.2A" oninput="updateLivePanel()">
+        </div>
+        <div class="field-group">
+          <label>Capacitor reading</label>
+          <input type="text" id="capacitorReading" placeholder="e.g. 44.2 uF (rated 45)" oninput="updateLivePanel()">
+        </div>
+        <div style="font-size:10px; color:var(--accent); font-family:var(--mono); padding:6px 0; letter-spacing:0.5px;">&#x26A1; PRO ACTIVE &mdash; field data feeds diagnosis</div>
+      </div>
+    </div>
     <div class="sidebar-section">
       <div class="sidebar-label">Quick Prompts</div>
       <button class="quick-btn" onclick="quickPrompt('My AC is running but not cooling. Outside temp is 95°F. What should I check first?')">
@@ -1492,6 +1633,7 @@ let currentMode = 'diagnose';
 let conversationHistory = [];
 let isLoading = false;
 let pendingImages = []; // {base64, mediaType, previewUrl}
+let pendingProMessage = null;
 
 function handleImageUpload(input) {
   const files = Array.from(input.files);
@@ -1630,6 +1772,13 @@ function updateFrustration(val) {
 document.addEventListener('DOMContentLoaded', () => {
   updateFrustration(5);
   updateLivePanel();
+  // Pro: check if already unlocked
+  if (isProUnlocked()) {
+    const lockEl = document.getElementById('proLock');
+    const fieldsEl = document.getElementById('proFields');
+    if (lockEl) lockEl.style.display = 'none';
+    if (fieldsEl) fieldsEl.style.display = 'block';
+  }
 });
 
 
@@ -1926,6 +2075,22 @@ function getSystemContext() {
   if (outdoorRunning)          ctx += `Outdoor unit status: ${outdoorRunning}. `;
   if (outdoorBrand)            ctx += `Brand/model: ${outdoorBrand}. `;
   if (outdoorChecks.length>0)  ctx += `Visual observations on outdoor unit: ${outdoorChecks.join(', ')}. `;
+  if (isProUnlocked()) {
+    const suction = document.getElementById('suctionPressure')?.value;
+    const head = document.getElementById('headPressure')?.value;
+    const superheatVal = document.getElementById('superheat')?.value;
+    const subcoolingVal = document.getElementById('subcooling')?.value;
+    const voltage = document.getElementById('supplyVoltage')?.value;
+    const amps = document.getElementById('compressorAmps')?.value;
+    const capacitor = document.getElementById('capacitorReading')?.value;
+    if (suction) ctx += `Suction pressure: ${suction}. `;
+    if (head) ctx += `Head pressure: ${head}. `;
+    if (superheatVal) ctx += `Superheat: ${superheatVal}. `;
+    if (subcoolingVal) ctx += `Subcooling: ${subcoolingVal}. `;
+    if (voltage) ctx += `Supply voltage: ${voltage}. `;
+    if (amps) ctx += `Compressor amp draw: ${amps}. `;
+    if (capacitor) ctx += `Capacitor reading: ${capacitor}. `;
+  }
   return ctx ? `${toneTip}${ctx}]` : '';
 }
 
@@ -2016,6 +2181,65 @@ function removeTyping() {
   if (t) t.remove();
 }
 
+// ── Pro Gate ──────────────────────────────────────────────────
+function isProUnlocked() {
+  return !!localStorage.getItem('fm_pro_email');
+}
+
+function detectProContent(text) {
+  const patterns = [
+    /\b\d+\s*(v|volts?)\b/i,
+    /\bL1\b|\bL2\b|\bL1\s+to\s+L2\b/i,
+    /\b(208|240|115|480)\b/,
+    /\b\d+\s*(psi|psig)\b/i,
+    /\b(suction|head pressure|high side|low side|discharge pressure)\b/i,
+    /\b(superheat|subcooling|sub-cooling|sub\s+cooling)\b/i,
+    /\b(microfarad|µF|uf|capacitor reading|compressor amps|amp draw|RLA|LRA|megohm|meg\s+ohm)\b/i,
+    /\b(manifold|gauges|gauge reading)\b/i
+  ];
+  return patterns.some(p => p.test(text));
+}
+
+function showProGate() {
+  document.getElementById('proGateBackdrop').style.display = 'flex';
+  document.getElementById('proEmailInput').value = '';
+  document.getElementById('proGateForm').style.display = 'block';
+  document.getElementById('proGateSuccess').style.display = 'none';
+}
+
+function hideProGate() {
+  document.getElementById('proGateBackdrop').style.display = 'none';
+  document.getElementById('proEmailInput').value = '';
+}
+
+function submitProGate() {
+  const email = document.getElementById('proEmailInput').value.trim();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    document.getElementById('proEmailInput').style.borderColor = 'var(--warn)';
+    document.getElementById('proEmailInput').focus();
+    return;
+  }
+  document.getElementById('proEmailInput').style.borderColor = '';
+  localStorage.setItem('fm_pro_email', email);
+  document.getElementById('proGateForm').style.display = 'none';
+  document.getElementById('proGateSuccess').style.display = 'block';
+  // Unlock the sidebar pro fields
+  const lockEl = document.getElementById('proLock');
+  const fieldsEl = document.getElementById('proFields');
+  if (lockEl) lockEl.style.display = 'none';
+  if (fieldsEl) fieldsEl.style.display = 'block';
+  setTimeout(() => {
+    hideProGate();
+    if (pendingProMessage) {
+      document.getElementById('userInput').value = pendingProMessage;
+      pendingProMessage = null;
+      sendMessage();
+    }
+  }, 1500);
+}
+// ────────────────────────────────────────────────────────────────
+
 async function sendMessage() {
   if (isLoading) return;
   const input = document.getElementById('userInput');
@@ -2027,6 +2251,17 @@ async function sendMessage() {
   input.style.height = 'auto';
   isLoading = true;
   sendBtn.disabled = true;
+
+  // Pro gate: intercept if pro content detected and not unlocked
+  if (detectProContent(text) && !isProUnlocked()) {
+    pendingProMessage = text;
+    showProGate();
+    isLoading = false;
+    sendBtn.disabled = false;
+    input.value = text;
+    return;
+  }
+
 
   const ctx = getSystemContext();
   const textWithCtx = ctx ? `${text}\n\n${ctx}` : text;
@@ -2083,5 +2318,32 @@ async function sendMessage() {
   input.focus();
 }
 </script>
+
+<!-- Pro Gate Modal -->
+<div id="proGateBackdrop" class="pro-modal-backdrop" style="display:none;">
+  <div class="pro-modal">
+    <button class="pro-modal-close" onclick="hideProGate()">&#x2715;</button>
+    <div id="proGateForm">
+      <h2>&#x26A1; Pro Feature Detected</h2>
+      <p>Looks like you have real field measurements. FieldMind Pro gives HVAC techs sharper diagnosis using actual gauge and voltage readings.</p>
+      <ul>
+        <li>Manifold gauge readings (suction, head, superheat, subcooling)</li>
+        <li>Voltage &amp; amp readings</li>
+        <li>Wiring diagram analysis</li>
+        <li>Professional job reports</li>
+        <li>Flat-rate pricing guidance</li>
+      </ul>
+      <input type="email" id="proEmailInput" class="pro-email-input" placeholder="your@email.com" onkeydown="if(event.key==='Enter')submitProGate()">
+      <button class="pro-unlock-btn" onclick="submitProGate()">Unlock Pro &mdash; Free Beta Access</button>
+      <div style="font-size:11px; color:var(--muted); text-align:center; margin-top:10px;">No credit card. Free during beta. Cancel anytime.</div>
+    </div>
+    <div id="proGateSuccess" style="display:none; text-align:center; padding:16px 0;">
+      <div style="font-size:32px; margin-bottom:12px;">&#x2713;</div>
+      <div style="font-family:var(--display); font-size:16px; font-weight:700; color:var(--good); margin-bottom:8px;">Pro unlocked!</div>
+      <div style="font-size:13px; color:var(--muted); line-height:1.6;">Your field data will now be used for sharper diagnosis.</div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

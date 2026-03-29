@@ -7,7 +7,8 @@ AI-powered HVAC diagnostic web app. Helps HVAC techs and homeowners diagnose iss
 Replace Joe's $72k/year maintenance tech job with product revenue. Early retirement.
 
 ## Live URLs
-- Production: https://fieldmind-app.netlify.app
+- Production: https://fieldmind.net (custom domain, purchased 2026-03-28 via Netlify)
+- Fallback: https://fieldmind-app.netlify.app
 - GitHub: https://github.com/joesnobord/fieldmind
 - Netlify admin: https://app.netlify.com/projects/fieldmind-app
 
