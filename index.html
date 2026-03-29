@@ -2587,9 +2587,14 @@ async function sendMessage() {
   showTyping();
 
   try {
+    const { data: { session: chatSession } } = await sbClient.auth.getSession();
+    const chatToken = chatSession ? chatSession.access_token : '';
     const response = await fetch('/.netlify/functions/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + chatToken
+      },
       body: JSON.stringify({
         system: SYSTEM_PROMPTS[currentMode],
         messages: conversationHistory
