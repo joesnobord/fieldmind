@@ -1745,7 +1745,7 @@
 // ── Supabase Auth ──────────────────────────────────────────────
 const SUPABASE_URL = 'https://apheessofosikxekaqov.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_-nAVqFP2M5lvOfFUbMeIPg_lND58jYT';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let sbClient = null;
 
 let currentUser = null;
 
