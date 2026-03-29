@@ -673,6 +673,18 @@
     .messages { padding: 16px; }
   }
 
+
+  /* Pro-only tabs */
+  .mode-tab.pro-tab.locked {
+    opacity: 0.45;
+    cursor: not-allowed;
+    position: relative;
+  }
+  .mode-tab.pro-tab.locked:hover {
+    background: transparent;
+    color: var(--muted);
+  }
+
   /* Auth Modal */
   .auth-backdrop {
     position: fixed;
@@ -990,9 +1002,9 @@
 
 <div class="mode-bar">
   <button class="mode-tab active" onclick="setMode('diagnose', this)">Diagnostics</button>
-  <button class="mode-tab" onclick="setMode('size', this)">System Sizing</button>
-  <button class="mode-tab" onclick="setMode('install', this)">Installation</button>
-  <button class="mode-tab" onclick="setMode('estimate', this)">Job Estimating</button>
+  <button class="mode-tab pro-tab" id="tab-size" onclick="setMode('size', this)">System Sizing 🔒</button>
+  <button class="mode-tab pro-tab" id="tab-install" onclick="setMode('install', this)">Installation 🔒</button>
+  <button class="mode-tab pro-tab" id="tab-estimate" onclick="setMode('estimate', this)">Job Estimating 🔒</button>
   <button class="mode-tab" onclick="setMode('vent', this)">Tech Frustrations</button>
 </div>
 
@@ -2022,7 +2034,28 @@ function removeImage(index) {
   renderImagePreviews();
 }
 
+
+function applyProTabLocks() {
+  const proTabs = document.querySelectorAll('.pro-tab');
+  proTabs.forEach(tab => {
+    if (userPlan === 'pro') {
+      tab.classList.remove('locked');
+      // Remove lock icon
+      tab.textContent = tab.textContent.replace(' 🔒', '');
+    } else {
+      tab.classList.add('locked');
+      // Add lock icon if missing
+      if (!tab.textContent.includes('🔒')) tab.textContent += ' 🔒';
+    }
+  });
+}
+
 function setMode(mode, btn) {
+  const proModes = ['size', 'install', 'estimate'];
+  if (proModes.includes(mode) && userPlan !== 'pro') {
+    showUpgradeModal();
+    return;
+  }
   currentMode = mode;
   document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
@@ -2548,8 +2581,10 @@ function updateUsagePill(usageInfo) {
     pill.className = 'usage-pill pro';
     pill.textContent = '⚡ PRO';
     pill.style.display = 'flex';
+    applyProTabLocks();
     return;
   }
+  applyProTabLocks();
   const used = usageInfo.messages_used || 0;
   const limit = usageInfo.limit || 10;
   const remaining = limit - used;
