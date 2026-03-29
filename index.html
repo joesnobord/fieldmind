@@ -1880,6 +1880,7 @@ function onAuthSuccess(user, session) {
   const display = user.email.split('@')[0] + '@…';
   document.getElementById('userEmailDisplay').textContent = display;
   document.getElementById('authHeaderArea').style.display = 'flex';
+  loadUsageInfo();
 }
 
 async function signOut() {
@@ -2539,6 +2540,33 @@ function removeTyping() {
 
 // ── Pro Gate ──────────────────────────────────────────────────
 // ── Upgrade ──────────────────────────────────────────────────
+async function loadUsageInfo() {
+  if (!currentSession) return;
+  try {
+    const token = currentSession.access_token || '';
+    const response = await fetch('/.netlify/functions/get-profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+    });
+    if (!response.ok) return;
+    const profile = await response.json();
+    if (profile && !profile.error) {
+      userPlan = profile.plan;
+      updateUsagePill({
+        plan: profile.plan,
+        messages_used: profile.messages_used,
+        limit: profile.plan === 'free' ? 10 : null
+      });
+      if (profile.plan === 'pro') {
+        const lockEl = document.getElementById('proLock');
+        const fieldsEl = document.getElementById('proFields');
+        if (lockEl) lockEl.style.display = 'none';
+        if (fieldsEl) fieldsEl.style.display = 'block';
+      }
+    }
+  } catch(e) { console.error('loadUsageInfo failed:', e); }
+}
+
 function showUpgradeModal() {
   const el = document.getElementById('upgradeBackdrop');
   if (el) el.style.display = 'flex';
