@@ -1790,7 +1790,7 @@ async function doSignIn() {
   if (!email || !password) { showAuthError('signinError', 'Please enter your email and password.'); return; }
   const btn = document.getElementById('signinBtn');
   btn.disabled = true; btn.textContent = 'Signing in…';
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
   btn.disabled = false; btn.textContent = 'SIGN IN →';
   if (error) { showAuthError('signinError', error.message); return; }
   onAuthSuccess(data.user);
@@ -1807,7 +1807,7 @@ async function doSignUp() {
   if (password !== password2) { showAuthError('signupError', 'Passwords don\'t match.'); return; }
   const btn = document.getElementById('signupBtn');
   btn.disabled = true; btn.textContent = 'Creating account…';
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await sbClient.auth.signUp({ email, password });
   btn.disabled = false; btn.textContent = 'CREATE ACCOUNT →';
   if (error) { showAuthError('signupError', error.message); return; }
   if (data.user && data.session) {
@@ -1823,7 +1823,7 @@ async function doForgot() {
   document.getElementById('forgotError').style.display = 'none';
   document.getElementById('forgotSuccess').style.display = 'none';
   if (!email) { showAuthError('forgotError', 'Please enter your email address.'); return; }
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+  const { error } = await sbClient.auth.resetPasswordForEmail(email, {
     redirectTo: window.location.origin
   });
   if (error) { showAuthError('forgotError', error.message); return; }
@@ -1840,7 +1840,7 @@ function onAuthSuccess(user) {
 }
 
 async function signOut() {
-  await supabase.auth.signOut();
+  await sbClient.auth.signOut();
   currentUser = null;
   document.getElementById('authHeaderArea').style.display = 'none';
   document.getElementById('authBackdrop').style.display = 'flex';
@@ -1850,14 +1850,14 @@ async function signOut() {
 
 // Check existing session on load
 async function initAuth() {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await sbClient.auth.getSession();
   if (session && session.user) {
     onAuthSuccess(session.user);
   } else {
     document.getElementById('authBackdrop').style.display = 'flex';
   }
   // Listen for auth changes (e.g. password reset redirect)
-  supabase.auth.onAuthStateChange((_event, session) => {
+  sbClient.auth.onAuthStateChange((_event, session) => {
     if (session && session.user && !currentUser) {
       onAuthSuccess(session.user);
     }
@@ -2070,6 +2070,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lockEl) lockEl.style.display = 'none';
     if (fieldsEl) fieldsEl.style.display = 'block';
   }
+  // Init Supabase client
+  sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   // Init auth (hides/shows auth gate based on session)
   initAuth();
 });
