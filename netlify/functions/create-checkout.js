@@ -35,6 +35,13 @@ exports.handler = async function(event) {
     // Get priceId from request body, fall back to env default
     const body = JSON.parse(event.body || '{}');
     const VALID_PRICES = [
+      // Test mode
+      'price_1TGnKiGdsQzGCcrlIycPHXQC', // Homeowner monthly
+      'price_1TGnKiGdsQzGCcrls542mmEJ', // Homeowner annual
+      'price_1TGnKiGdsQzGCcrlCmNSKVwd', // Pro monthly
+      'price_1TGnKiGdsQzGCcrlcyvc7k60', // Pro annual
+      'price_1TGnKjGdsQzGCcrl7179fkUd', // Team annual
+      // Live mode
       'price_1TGnDhGdsQzGCcrlg1ddeNwE', // Homeowner monthly
       'price_1TGnDhGdsQzGCcrlWVRbHiTq', // Homeowner annual
       'price_1TGnDhGdsQzGCcrl4zEgH1Wy', // Pro monthly
