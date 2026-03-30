@@ -32,12 +32,23 @@ exports.handler = async function(event) {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     if (authError || !user) return { statusCode: 401, body: JSON.stringify({ error: 'Invalid session' }) };
 
+    // Get priceId from request body, fall back to env default
+    const body = JSON.parse(event.body || '{}');
+    const VALID_PRICES = [
+      'price_1TGnDhGdsQzGCcrlg1ddeNwE', // Homeowner monthly
+      'price_1TGnDhGdsQzGCcrlWVRbHiTq', // Homeowner annual
+      'price_1TGnDhGdsQzGCcrl4zEgH1Wy', // Pro monthly
+      'price_1TGnDiGdsQzGCcrlIhtKdPnN', // Pro annual
+      'price_1TGnDiGdsQzGCcrlAGd9lGSn'  // Team annual
+    ];
+    const priceId = VALID_PRICES.includes(body.priceId) ? body.priceId : process.env.STRIPE_PRICE_ID;
+
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'subscription',
       line_items: [{
-        price: process.env.STRIPE_PRICE_ID,
+        price: priceId,
         quantity: 1
       }],
       customer_email: user.email,

@@ -2643,25 +2643,61 @@ function closeUpgrade() {
   if (el) el.style.display = 'none';
 }
 
+// Price IDs
+const PRICE_IDS = {
+  hw_month:  'price_1TGnDhGdsQzGCcrlg1ddeNwE',
+  hw_year:   'price_1TGnDhGdsQzGCcrlWVRbHiTq',
+  pro_month: 'price_1TGnDhGdsQzGCcrl4zEgH1Wy',
+  pro_year:  'price_1TGnDiGdsQzGCcrlIhtKdPnN',
+  team:      'price_1TGnDiGdsQzGCcrlAGd9lGSn'
+};
+
+let selectedPlan = 'pro_month';
+
+function selectPlan(plan) {
+  selectedPlan = plan;
+  // Update card borders
+  document.querySelectorAll('.upgrade-plan-card').forEach(c => {
+    c.style.border = '1px solid rgba(255,255,255,0.1)';
+    c.style.background = 'var(--surface2)';
+  });
+  const sel = document.getElementById('planCard_' + plan);
+  if (sel) { sel.style.border = '2px solid var(--accent)'; sel.style.background = 'rgba(0,212,255,0.06)'; }
+  // Hide annual toggle for team (already annual)
+  const toggleRow = document.getElementById('annualToggleRow');
+  if (toggleRow) toggleRow.style.display = plan === 'team' ? 'none' : 'flex';
+}
+
+function toggleAnnual() {
+  const isAnnual = document.getElementById('annualToggle').checked;
+  // If current plan is monthly, switch to annual equivalent and vice versa
+  if (selectedPlan === 'pro_month' && isAnnual) selectPlan('pro_year');
+  else if (selectedPlan === 'pro_year' && !isAnnual) selectPlan('pro_month');
+  else if (selectedPlan === 'hw_month' && isAnnual) selectPlan('hw_year');
+  else if (selectedPlan === 'hw_year' && !isAnnual) selectPlan('hw_month');
+}
+
 async function goToPro() {
   const btn = document.getElementById('upgradeBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Loading…'; }
   try {
     const chatToken = currentSession ? currentSession.access_token : '';
+    const priceId = PRICE_IDS[selectedPlan] || PRICE_IDS['pro_month'];
     const response = await fetch('/.netlify/functions/create-checkout', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + chatToken }
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + chatToken },
+      body: JSON.stringify({ priceId })
     });
     const data = await response.json();
     if (data.url) {
       window.location.href = data.url;
     } else {
       alert('Could not start checkout: ' + (data.error || 'Unknown error'));
-      if (btn) { btn.disabled = false; btn.textContent = 'UPGRADE TO PRO →'; }
+      if (btn) { btn.disabled = false; btn.textContent = 'GET STARTED →'; }
     }
   } catch (err) {
     alert('Checkout error: ' + err.message);
-    if (btn) { btn.disabled = false; btn.textContent = 'UPGRADE TO PRO →'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'GET STARTED →'; }
   }
 }
 // ─────────────────────────────────────────────────────────────
@@ -2865,19 +2901,68 @@ async function sendMessage() {
 
 <!-- Upgrade Modal -->
 <div id="upgradeBackdrop" class="upgrade-backdrop">
-  <div class="upgrade-modal">
+  <div class="upgrade-modal" style="max-width:520px;">
     <div class="um-icon">🚀</div>
-    <h2>Upgrade to Pro</h2>
-    <p>You've hit a free tier limit. Upgrade to Pro for unlimited access and advanced features.</p>
-    <div class="upgrade-features">
-      <div class="uf-item">Unlimited AI messages</div>
-      <div class="uf-item">Pro gauge &amp; voltage fields</div>
-      <div class="uf-item">Photo &amp; image analysis</div>
-      <div class="uf-item">Saved conversation history</div>
-      <div class="uf-item">Job report exports</div>
+    <h2>Unlock FieldMind</h2>
+    <p>You've used your free messages. Choose a plan to keep going.</p>
+
+    <!-- Plan cards -->
+    <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+
+      <!-- Homeowner -->
+      <div class="upgrade-plan-card" id="planCard_hw_month" onclick="selectPlan('hw_month')" style="cursor:pointer; padding:14px 16px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:var(--surface2);">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-family:var(--display); font-weight:700; font-size:14px;">Homeowner</div>
+            <div style="font-size:12px; color:var(--muted); margin-top:2px;">Basic diagnostics · 2 modes</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:var(--display); font-size:18px; font-weight:700; color:var(--accent);">$12<span style="font-size:12px; color:var(--muted); font-weight:400;">/mo</span></div>
+            <div style="font-size:11px; color:var(--muted);">or $99/yr · save 30%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pro -->
+      <div class="upgrade-plan-card selected" id="planCard_pro_month" onclick="selectPlan('pro_month')" style="cursor:pointer; padding:14px 16px; border-radius:10px; border:2px solid var(--accent); background:rgba(0,212,255,0.06); position:relative;">
+        <div style="position:absolute; top:-10px; right:14px; background:var(--accent); color:#000; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; font-family:var(--mono);">POPULAR</div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-family:var(--display); font-weight:700; font-size:14px;">Pro · Tech</div>
+            <div style="font-size:12px; color:var(--muted); margin-top:2px;">All modes · Unlimited · Image analysis</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:var(--display); font-size:18px; font-weight:700; color:var(--accent);">$29<span style="font-size:12px; color:var(--muted); font-weight:400;">/mo</span></div>
+            <div style="font-size:11px; color:var(--muted);">or $249/yr · save 30%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Team -->
+      <div class="upgrade-plan-card" id="planCard_team" onclick="selectPlan('team')" style="cursor:pointer; padding:14px 16px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:var(--surface2);">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-family:var(--display); font-weight:700; font-size:14px;">Team</div>
+            <div style="font-size:12px; color:var(--muted); margin-top:2px;">Up to 5 techs · All Pro features</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:var(--display); font-size:18px; font-weight:700; color:var(--accent);">$399<span style="font-size:12px; color:var(--muted); font-weight:400;">/yr</span></div>
+            <div style="font-size:11px; color:var(--muted);">$6.65/tech/mo</div>
+          </div>
+        </div>
+      </div>
+
     </div>
-    <div class="upgrade-price">$12<span>/month &nbsp;·&nbsp; or $99/year</span></div>
-    <button class="upgrade-btn" id="upgradeBtn" onclick="goToPro()">UPGRADE TO PRO →</button>
+
+    <!-- Annual toggle for homeowner/pro -->
+    <div id="annualToggleRow" style="display:flex; align-items:center; gap:10px; margin-bottom:20px; font-size:13px; color:var(--muted);">
+      <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+        <input type="checkbox" id="annualToggle" onchange="toggleAnnual()" style="accent-color:var(--accent); width:16px; height:16px;">
+        Pay annually and save 30%
+      </label>
+    </div>
+
+    <button class="upgrade-btn" id="upgradeBtn" onclick="goToPro()">GET STARTED →</button>
     <button class="upgrade-dismiss" onclick="closeUpgrade()">Maybe later</button>
   </div>
 </div>
