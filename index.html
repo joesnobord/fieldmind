@@ -1117,7 +1117,7 @@
             <span class="priority-badge">Very helpful</span>
             Brand and model (if visible)
           </label>
-          <input type="text" id="outdoorBrand" placeholder="e.g. Carrier 24ACC636, Trane XR15" oninput="markFilled(this); updateLivePanel()">
+          <input type="text" id="outdoorBrand" placeholder="e.g. Carrier 24ACC636, Trane XR15" autocomplete="off" oninput="markFilled(this); updateLivePanel()">
           <div class="how-to-know" onclick="toggleHow('how-brand')">
             <span class="htk-trigger">&#63; Where do I find this?</span>
             <div class="htk-body" id="how-brand">
@@ -1286,7 +1286,7 @@
           <span class="priority-badge">Optional</span>
           Thermostat setting vs actual indoor temp
         </label>
-        <input type="text" id="tempDelta" placeholder="e.g. set 72°, reading 80°" oninput="markFilled(this); updateLivePanel()">
+        <input type="text" id="tempDelta" placeholder="e.g. set 72°, reading 80°" autocomplete="off" oninput="markFilled(this); updateLivePanel()">
         <div class="how-to-know" onclick="toggleHow('how-temp')">
           <span class="htk-trigger">&#63; How do I know?</span>
           <div class="htk-body" id="how-temp">
@@ -1318,31 +1318,31 @@
       <div id="proFields" style="display:none;">
         <div class="field-group">
           <label>Suction pressure (low side)</label>
-          <input type="text" id="suctionPressure" placeholder="e.g. 68 psig" oninput="updateLivePanel()">
+          <input type="text" id="suctionPressure" placeholder="e.g. 68 psig" autocomplete="off" oninput="updateLivePanel()">
         </div>
         <div class="field-group">
           <label>Head pressure (high side)</label>
-          <input type="text" id="headPressure" placeholder="e.g. 250 psig" oninput="updateLivePanel()">
+          <input type="text" id="headPressure" placeholder="e.g. 250 psig" autocomplete="off" oninput="updateLivePanel()">
         </div>
         <div class="field-group">
           <label>Superheat (&deg;F)</label>
-          <input type="text" id="superheat" placeholder="e.g. 12F" oninput="updateLivePanel()">
+          <input type="text" id="superheat" placeholder="e.g. 12F" autocomplete="off" oninput="updateLivePanel()">
         </div>
         <div class="field-group">
           <label>Subcooling (&deg;F)</label>
-          <input type="text" id="subcooling" placeholder="e.g. 10F" oninput="updateLivePanel()">
+          <input type="text" id="subcooling" placeholder="e.g. 10F" autocomplete="off" oninput="updateLivePanel()">
         </div>
         <div class="field-group">
           <label>Supply voltage</label>
-          <input type="text" id="supplyVoltage" placeholder="e.g. 240v" oninput="updateLivePanel()">
+          <input type="text" id="supplyVoltage" placeholder="e.g. 240v" autocomplete="off" oninput="updateLivePanel()">
         </div>
         <div class="field-group">
           <label>Compressor amp draw</label>
-          <input type="text" id="compressorAmps" placeholder="e.g. 14.2A" oninput="updateLivePanel()">
+          <input type="text" id="compressorAmps" placeholder="e.g. 14.2A" autocomplete="off" oninput="updateLivePanel()">
         </div>
         <div class="field-group">
           <label>Capacitor reading</label>
-          <input type="text" id="capacitorReading" placeholder="e.g. 44.2 uF (rated 45)" oninput="updateLivePanel()">
+          <input type="text" id="capacitorReading" placeholder="e.g. 44.2 uF (rated 45)" autocomplete="off" oninput="updateLivePanel()">
         </div>
         <div style="font-size:10px; color:var(--accent); font-family:var(--mono); padding:6px 0; letter-spacing:0.5px;">&#x26A1; PRO ACTIVE &mdash; field data feeds diagnosis</div>
       </div>
@@ -1475,7 +1475,7 @@
 
         <div class="field-group">
           <label>Unusual Heat Loads</label>
-          <input type="text" id="size-loads" placeholder="e.g. server room, sunroom, workshop…">
+          <input type="text" id="size-loads" placeholder="e.g. server room, sunroom, workshop…" autocomplete="off">
         </div>
       </div>
 
