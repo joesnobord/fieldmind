@@ -993,6 +993,7 @@
     <div id="authHeaderArea" style="display:none; align-items:center; gap:10px;">
       <div id="usagePill" class="usage-pill" style="display:none;"></div>
       <span class="user-badge"><span class="ub-dot"></span><span id="userEmailDisplay"></span></span>
+      <button id="teamBtn" class="logout-btn" onclick="showTeamDashboard()" style="display:none;">TEAM</button>
       <button class="logout-btn" onclick="signOut()">SIGN OUT</button>
     </div>
   </div>
@@ -1894,6 +1895,7 @@ function onAuthSuccess(user, session) {
   document.getElementById('userEmailDisplay').textContent = display;
   document.getElementById('authHeaderArea').style.display = 'flex';
   loadUsageInfo();
+  checkTeamInvite();
 }
 
 async function signOut() {
@@ -2629,9 +2631,146 @@ async function loadUsageInfo() {
         if (lockEl) lockEl.style.display = 'none';
         if (fieldsEl) fieldsEl.style.display = 'block';
       }
+      // Show Team button if user is a team owner
+      if (profile.is_team_owner) {
+        const teamBtn = document.getElementById('teamBtn');
+        if (teamBtn) teamBtn.style.display = 'inline-block';
+      }
     }
   } catch(e) { console.error('loadUsageInfo failed:', e); }
 }
+
+// ── Team Dashboard ───────────────────────────────────────────
+let teamData = null;
+
+async function loadTeamData() {
+  const token = currentSession?.access_token || '';
+  const res = await fetch('/.netlify/functions/team', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ action: 'get' })
+  });
+  const data = await res.json();
+  teamData = data.team;
+  return teamData;
+}
+
+async function showTeamDashboard() {
+  document.getElementById('teamBackdrop').style.display = 'flex';
+  document.getElementById('teamSeatsBar').textContent = 'Loading…';
+  document.getElementById('teamMemberList').innerHTML = '';
+  const team = await loadTeamData();
+  if (!team) {
+    document.getElementById('teamSeatsBar').textContent = 'No team found. Please contact support.';
+    return;
+  }
+  const members = team.team_members || [];
+  const active = members.filter(m => m.status === 'active').length;
+  const pending = members.filter(m => m.status === 'pending').length;
+  const used = active + pending + 1; // +1 for owner
+  document.getElementById('teamSeatsBar').innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span style="color:var(--muted);">Seats used</span>
+      <span style="font-family:var(--mono); font-weight:700; color:var(--accent);">${used} / ${team.max_seats}</span>
+    </div>
+    <div style="margin-top:10px; height:6px; background:var(--border2); border-radius:3px; overflow:hidden;">
+      <div style="height:100%; width:${(used/team.max_seats)*100}%; background:var(--accent); border-radius:3px;"></div>
+    </div>`;
+
+  // Member rows
+  const listEl = document.getElementById('teamMemberList');
+  listEl.innerHTML = `<div style="font-size:12px; font-weight:600; color:var(--muted); letter-spacing:0.5px; text-transform:uppercase; margin-bottom:10px;">Members</div>`;
+
+  // Owner row
+  listEl.innerHTML += `
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:var(--surface2); border-radius:8px; margin-bottom:6px; font-size:13px;">
+      <span>${currentUser.email}</span>
+      <span style="font-family:var(--mono); font-size:11px; color:var(--good);">OWNER</span>
+    </div>`;
+
+  members.forEach(m => {
+    const badge = m.status === 'active'
+      ? `<span style="font-family:var(--mono); font-size:11px; color:var(--good);">ACTIVE</span>`
+      : `<span style="font-family:var(--mono); font-size:11px; color:var(--muted);">PENDING</span>`;
+    listEl.innerHTML += `
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:var(--surface2); border-radius:8px; margin-bottom:6px; font-size:13px;">
+        <span style="color:var(--text);">${m.invited_email}</span>
+        <div style="display:flex; align-items:center; gap:12px;">
+          ${badge}
+          <button onclick="removeTeamMember('${m.invited_email}')" style="background:none; border:none; color:var(--muted); cursor:pointer; font-size:12px;" title="Remove">✕</button>
+        </div>
+      </div>`;
+  });
+
+  if (members.length === 0) {
+    listEl.innerHTML += `<div style="font-size:13px; color:var(--muted); padding:10px 0;">No members yet. Invite your team below.</div>`;
+  }
+}
+
+function closeTeamDashboard() {
+  document.getElementById('teamBackdrop').style.display = 'none';
+}
+
+async function sendTeamInvite() {
+  const email = document.getElementById('inviteEmail').value.trim();
+  const msgEl = document.getElementById('inviteMsg');
+  msgEl.style.display = 'none';
+  if (!email) return;
+
+  const token = currentSession?.access_token || '';
+  const res = await fetch('/.netlify/functions/team', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ action: 'invite', email })
+  });
+  const data = await res.json();
+
+  msgEl.style.display = 'block';
+  if (data.success) {
+    msgEl.style.color = 'var(--good)';
+    msgEl.textContent = `✓ Invite sent to ${email}`;
+    document.getElementById('inviteEmail').value = '';
+    showTeamDashboard(); // refresh
+  } else {
+    msgEl.style.color = 'var(--warn)';
+    msgEl.textContent = data.error || 'Something went wrong';
+  }
+}
+
+async function removeTeamMember(email) {
+  if (!confirm(`Remove ${email} from the team?`)) return;
+  const token = currentSession?.access_token || '';
+  const res = await fetch('/.netlify/functions/team', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ action: 'remove', email })
+  });
+  const data = await res.json();
+  if (data.success) showTeamDashboard();
+  else alert(data.error || 'Could not remove member');
+}
+
+// Check for team invite in URL on load
+async function checkTeamInvite() {
+  const params = new URLSearchParams(window.location.search);
+  const teamId = params.get('team_invite');
+  if (!teamId || !currentUser) return;
+  const token = currentSession?.access_token || '';
+  const res = await fetch('/.netlify/functions/team', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ action: 'accept', team_id: teamId })
+  });
+  const data = await res.json();
+  if (data.success) {
+    // Refresh plan
+    await loadUsageInfo();
+    // Clean URL
+    window.history.replaceState({}, '', '/');
+    alert('✓ You have joined the team! Your account is now Pro.');
+  }
+}
+// ─────────────────────────────────────────────────────────────
 
 function showUpgradeModal() {
   const el = document.getElementById('upgradeBackdrop');
@@ -2989,6 +3128,39 @@ async function sendMessage() {
       <div style="font-size:32px; margin-bottom:12px;">&#x2713;</div>
       <div style="font-family:var(--display); font-size:16px; font-weight:700; color:var(--good); margin-bottom:8px;">Pro unlocked!</div>
       <div style="font-size:13px; color:var(--muted); line-height:1.6;">Your field data will now be used for sharper diagnosis.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Team Dashboard Modal -->
+<div id="teamBackdrop" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; display:none; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:var(--surface); border:1px solid var(--border2); border-radius:20px; padding:40px; max-width:500px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.5); max-height:90vh; overflow-y:auto;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+      <div style="font-family:var(--display); font-size:20px; font-weight:700;">👥 Team Dashboard</div>
+      <button onclick="closeTeamDashboard()" style="background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer;">✕</button>
+    </div>
+
+    <!-- Seats summary -->
+    <div id="teamSeatsBar" style="background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:16px; margin-bottom:20px; font-size:14px;">
+      Loading…
+    </div>
+
+    <!-- Member list -->
+    <div id="teamMemberList" style="margin-bottom:20px;"></div>
+
+    <!-- Invite form -->
+    <div style="border-top:1px solid var(--border); padding-top:20px;">
+      <div style="font-size:12px; font-weight:600; color:var(--muted); letter-spacing:0.5px; text-transform:uppercase; margin-bottom:10px;">Invite a team member</div>
+      <div style="display:flex; gap:8px;">
+        <input id="inviteEmail" type="email" placeholder="colleague@email.com"
+          style="flex:1; background:var(--surface2); border:1px solid var(--border2); border-radius:8px; padding:10px 14px; color:var(--text); font-size:14px; outline:none;"
+          onkeydown="if(event.key==='Enter') sendTeamInvite()">
+        <button onclick="sendTeamInvite()"
+          style="background:var(--accent); color:#000; font-family:var(--display); font-size:12px; font-weight:700; padding:10px 18px; border:none; border-radius:8px; cursor:pointer; white-space:nowrap;">
+          INVITE →
+        </button>
+      </div>
+      <div id="inviteMsg" style="margin-top:10px; font-size:13px; display:none;"></div>
     </div>
   </div>
 </div>

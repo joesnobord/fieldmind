@@ -20,16 +20,26 @@ exports.handler = async function(event) {
 
     let { data: profile } = await supabase
       .from('profiles')
-      .select('plan, messages_used')
+      .select('plan, messages_used, team_id')
       .eq('id', user.id)
       .single();
 
     if (!profile) {
       await supabase.from('profiles').insert({ id: user.id, email: user.email });
-      profile = { plan: 'free', messages_used: 0 };
+      profile = { plan: 'free', messages_used: 0, team_id: null };
     }
 
-    return { statusCode: 200, headers: CORS, body: JSON.stringify(profile) };
+    // Check if user is a team owner
+    const { data: ownedTeam } = await supabase
+      .from('teams')
+      .select('id')
+      .eq('owner_id', user.id)
+      .single();
+
+    return { statusCode: 200, headers: CORS, body: JSON.stringify({
+      ...profile,
+      is_team_owner: !!ownedTeam
+    }) };
   } catch (err) {
     return { statusCode: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify({ error: err.message }) };
   }
