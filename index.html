@@ -2794,8 +2794,11 @@ async function sendMessage() {
       conversationHistory.push({ role: 'assistant', content: reply });
       addMessage('assistant', reply);
     } else if (data.error === 'limit_reached') {
-      // Remove the user's message from history so it doesn't get counted
+      // Remove user's message from history and from the chat UI
       conversationHistory.pop();
+      const messages = document.getElementById('messages');
+      const allUserMsgs = messages.querySelectorAll('.message.user');
+      if (allUserMsgs.length) allUserMsgs[allUserMsgs.length - 1].remove();
       showUpgradeModal();
     } else if (data.error) {
       addMessage('assistant', 'Error: ' + (typeof data.error === 'object' ? (data.error.message || JSON.stringify(data.error)) : data.error));
