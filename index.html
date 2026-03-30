@@ -2793,6 +2793,10 @@ async function sendMessage() {
       const reply = data.content[0].text;
       conversationHistory.push({ role: 'assistant', content: reply });
       addMessage('assistant', reply);
+    } else if (data.error === 'limit_reached') {
+      // Remove the user's message from history so it doesn't get counted
+      conversationHistory.pop();
+      showUpgradeModal();
     } else if (data.error) {
       addMessage('assistant', 'Error: ' + (typeof data.error === 'object' ? (data.error.message || JSON.stringify(data.error)) : data.error));
     } else {
