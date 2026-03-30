@@ -2793,6 +2793,8 @@ async function sendMessage() {
       const reply = data.content[0].text;
       conversationHistory.push({ role: 'assistant', content: reply });
       addMessage('assistant', reply);
+      // Update usage pill with fresh count from response
+      if (data.usage_info) updateUsagePill(data.usage_info);
     } else if (data.error === 'limit_reached') {
       // Remove user's message from history and from the chat UI
       conversationHistory.pop();
