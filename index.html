@@ -1876,7 +1876,7 @@ async function doForgot() {
   document.getElementById('forgotSuccess').style.display = 'none';
   if (!email) { showAuthError('forgotError', 'Please enter your email address.'); return; }
   const { error } = await sbClient.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin
+    redirectTo: window.location.origin + '/reset-password.html'
   });
   if (error) { showAuthError('forgotError', error.message); return; }
   showAuthSuccess('forgotSuccess', '✓ Password reset link sent! Check your inbox.');
