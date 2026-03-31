@@ -2644,11 +2644,9 @@ async function loadUsageInfo() {
         if (lockEl) lockEl.style.display = 'none';
         if (fieldsEl) fieldsEl.style.display = 'block';
       }
-      // Show Team button if user is a team owner
-      if (profile.is_team_owner) {
-        const teamBtn = document.getElementById('teamBtn');
-        if (teamBtn) teamBtn.style.display = 'inline-block';
-      }
+      // Show/hide Team button based on ownership
+      const teamBtn = document.getElementById('teamBtn');
+      if (teamBtn) teamBtn.style.display = profile.is_team_owner ? 'inline-block' : 'none';
     }
   } catch(e) { console.error('loadUsageInfo failed:', e); }
 }
