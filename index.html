@@ -1772,7 +1772,7 @@
           </select>
         </div>
         <div class="field-group">
-          <select id="refrig-refrigerant" onchange="markFilled(this)">
+          <select id="refrig-refrigerant" onchange="handleRefrigRefrigerantChange(this)">
             <option value="">Refrigerant type…</option>
             <option value="R-404A">R-404A (most common commercial)</option>
             <option value="R-448A / R-449A">R-448A / R-449A (404A replacement)</option>
@@ -1782,7 +1782,9 @@
             <option value="R-600a">R-600a (residential mini fridges)</option>
             <option value="CO2 (R-744)">CO2 / R-744 (transcritical)</option>
             <option value="unknown">Unknown</option>
+            <option value="other">Other (type below)</option>
           </select>
+          <input type="text" id="refrig-refrigerant-custom" placeholder="Enter refrigerant (e.g. R-407A)" style="display:none; margin-top:6px; width:100%; background:var(--surface2); border:1px solid var(--border2); color:var(--text); font-family:var(--sans); font-size:13px; padding:8px 10px; border-radius:6px;" oninput="markFilled(document.getElementById('refrig-refrigerant'))">
         </div>
       </div>
 
@@ -2210,6 +2212,18 @@ function renderImagePreviews() {
 function removeImage(index) {
   pendingImages.splice(index, 1);
   renderImagePreviews();
+}
+
+function handleRefrigRefrigerantChange(sel) {
+  const customInput = document.getElementById('refrig-refrigerant-custom');
+  if (sel.value === 'other') {
+    customInput.style.display = 'block';
+    customInput.focus();
+  } else {
+    customInput.style.display = 'none';
+    customInput.value = '';
+  }
+  markFilled(sel);
 }
 
 
@@ -2643,7 +2657,10 @@ function getSystemContext() {
 
   if (currentMode === 'refrig') {
     const apptype    = document.getElementById('refrig-apptype').value;
-    const refrigerant= document.getElementById('refrig-refrigerant').value;
+    const refrigSel  = document.getElementById('refrig-refrigerant').value;
+    const refrigerant= refrigSel === 'other'
+      ? (document.getElementById('refrig-refrigerant-custom').value.trim() || 'other/unknown')
+      : refrigSel;
     const boxtemp    = document.getElementById('refrig-boxtemp').value;
     const setpoint   = document.getElementById('refrig-setpoint').value;
     const compressor = document.getElementById('refrig-compressor').value;
