@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FieldMind — AI-Driven HVAC & Refrigeration Expert</title>
+<title>FieldMind - AI-Driven HVAC & Refrigeration Expert</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -998,7 +998,7 @@
   <div class="logo">
     <span class="logo-dot"></span>
     FieldMind
-    <span style="font-family:var(--sans); font-size:12px; font-weight:400; color:var(--muted); letter-spacing:0; margin-left:10px; border-left:1px solid var(--border2); padding-left:10px;">AI-driven HVAC expert</span>
+    <span style="font-family:var(--sans); font-size:12px; font-weight:400; color:var(--muted); letter-spacing:0; margin-left:10px; border-left:1px solid var(--border2); padding-left:10px;">AI-driven HVAC/R expert</span>
   </div>
   <div class="header-right">
     <span class="beta-badge">BETA</span>
@@ -1042,18 +1042,18 @@
         </label>
         <select id="hasOutdoor" onchange="detectSystem(); markFilled(this); toggleOutdoorDetail(this.value)">
           <option value="">Not sure / don't know</option>
-          <option value="yes">Yes — there's a unit outside</option>
+          <option value="yes">Yes - there's a unit outside</option>
           <option value="no">No outdoor unit</option>
         </select>
         <div class="how-to-know" onclick="toggleHow('how-outdoor')">
           <span class="htk-trigger">&#63; How do I know?</span>
           <div class="htk-body" id="how-outdoor">
-            Walk outside and look along the exterior walls of your home — usually on the side or back. It's a metal box about the size of a mini-fridge with a fan on top or side, sitting on a concrete pad or mounted on the wall. If you live in an apartment, check your balcony or a utility closet. No luck? Check your electric panel for a breaker labeled "AC," "Heat Pump," or "Condenser."
+            Walk outside and look along the exterior walls of your home - usually on the side or back. It's a metal box about the size of a mini-fridge with a fan on top or side, sitting on a concrete pad or mounted on the wall. If you live in an apartment, check your balcony or a utility closet. No luck? Check your electric panel for a breaker labeled "AC," "Heat Pump," or "Condenser."
           </div>
         </div>
       </div>
 
-      <!-- Outdoor unit detail — only shown when user says yes to outdoor unit -->
+      <!-- Outdoor unit detail - only shown when user says yes to outdoor unit -->
       <div id="outdoorDetail" style="display:none;">
         <div class="field-group p-critical" id="fg-outdoor-running">
           <label>
@@ -1062,9 +1062,9 @@
           </label>
           <select id="outdoorRunning" onchange="markFilled(this); updateLivePanel()">
             <option value="">Not sure</option>
-            <option value="yes — fan spinning and humming">Yes — fan is spinning and it's humming</option>
+            <option value="yes - fan spinning and humming">Yes - fan is spinning and it's humming</option>
             <option value="fan spinning but no hum from compressor">Fan spinning but no compressor hum</option>
-            <option value="no — completely off and silent">No — completely off and silent</option>
+            <option value="no - completely off and silent">No - completely off and silent</option>
             <option value="tries to start then shuts off">Tries to start then shuts off quickly</option>
             <option value="making loud unusual noise">Running but making a loud/unusual noise</option>
           </select>
@@ -1072,10 +1072,10 @@
             <span class="htk-trigger">&#63; How do I know?</span>
             <div class="htk-body" id="how-running">
               <strong>Go stand next to the outdoor unit while the thermostat is calling for cooling or heat.</strong><br><br>
-              <strong>Fan spinning:</strong> Look at the top or side grille — you should see fan blades moving.<br><br>
-              <strong>Compressor hum:</strong> Put your hand near the unit (don't touch). A running compressor makes a low steady hum or vibration — louder than just the fan.<br><br>
+              <strong>Fan spinning:</strong> Look at the top or side grille - you should see fan blades moving.<br><br>
+              <strong>Compressor hum:</strong> Put your hand near the unit (don't touch). A running compressor makes a low steady hum or vibration - louder than just the fan.<br><br>
               <strong>Completely off:</strong> No movement, no sound, nothing. Could mean the unit tripped a breaker or safety switch.<br><br>
-              <strong>Short-cycling:</strong> Starts up, runs for less than a minute, then shuts off — over and over.
+              <strong>Short-cycling:</strong> Starts up, runs for less than a minute, then shuts off - over and over.
             </div>
           </div>
         </div>
@@ -1112,7 +1112,7 @@
             </label>
             <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text); cursor:pointer; margin:0;">
               <input type="checkbox" value="everything looks normal outside" onchange="updateLivePanel()" style="width:14px;height:14px;margin:0;accent-color:var(--accent);">
-              Everything looks normal — nothing obvious
+              Everything looks normal - nothing obvious
             </label>
           </div>
           <div class="how-to-know" onclick="toggleHow('how-condition')">
@@ -1136,7 +1136,7 @@
           <div class="how-to-know" onclick="toggleHow('how-brand')">
             <span class="htk-trigger">&#63; Where do I find this?</span>
             <div class="htk-body" id="how-brand">
-              Look for a metal data plate or sticker on the side of the outdoor unit — usually on the back or inside the access panel. It will say the brand name (Carrier, Trane, Lennox, Goodman, Rheem, etc.) and have a model number that starts with letters and numbers like "24ACC636A003" or "4TTR3036L1000A."<br><br>
+              Look for a metal data plate or sticker on the side of the outdoor unit - usually on the back or inside the access panel. It will say the brand name (Carrier, Trane, Lennox, Goodman, Rheem, etc.) and have a model number that starts with letters and numbers like "24ACC636A003" or "4TTR3036L1000A."<br><br>
               Even just the brand name alone is helpful. The model number tells us the exact tonnage and series of the unit.
             </div>
           </div>
@@ -1154,13 +1154,13 @@
           <option value="electric_strip">Electric heat (no outdoor unit for heat)</option>
           <option value="heatpump">Heat pump (outdoor unit runs in winter too)</option>
           <option value="boiler">Boiler / radiators / in-floor heat</option>
-          <option value="none">No heat — AC only</option>
+          <option value="none">No heat - AC only</option>
         </select>
         <div class="how-to-know" onclick="toggleHow('how-heat')">
           <span class="htk-trigger">&#63; How do I know?</span>
           <div class="htk-body" id="how-heat">
             <strong>Gas furnace:</strong> You get a gas bill, and there's a metal box in a closet, basement, or garage with a flue pipe going up through the roof. Flames are blue when it fires.<br><br>
-            <strong>Heat pump:</strong> Your outdoor unit runs in winter too — go outside on a cold day and listen for it. Your thermostat may say "heat pump" or "emergency heat."<br><br>
+            <strong>Heat pump:</strong> Your outdoor unit runs in winter too - go outside on a cold day and listen for it. Your thermostat may say "heat pump" or "emergency heat."<br><br>
             <strong>Electric air handler:</strong> No gas bill for heat, outdoor unit only runs in summer, indoor unit is usually in a closet with just wires going in.<br><br>
             <strong>Boiler:</strong> You have cast-iron radiators, baseboard heaters, or warm floors. No vents blowing air.
           </div>
@@ -1177,12 +1177,12 @@
           <option value="ducts">Through vents in ceiling / floor / walls</option>
           <option value="mini">Wall-mounted indoor units (no vents)</option>
           <option value="window">Window or portable unit</option>
-          <option value="radiant">No air — radiant / baseboard heat only</option>
+          <option value="radiant">No air - radiant / baseboard heat only</option>
         </select>
         <div class="how-to-know" onclick="toggleHow('how-air')">
           <span class="htk-trigger">&#63; How do I know?</span>
           <div class="htk-body" id="how-air">
-            <strong>Vents (ducts):</strong> Look up at your ceiling or down at your floor — you'll see rectangular grilles that blow air when the system runs. Most common in US homes.<br><br>
+            <strong>Vents (ducts):</strong> Look up at your ceiling or down at your floor - you'll see rectangular grilles that blow air when the system runs. Most common in US homes.<br><br>
             <strong>Wall-mounted units (mini-split):</strong> There's a white rectangular unit mounted high on the wall in each room with its own remote control. No vents in the ceiling.<br><br>
             <strong>Window / portable:</strong> The unit sits in a window or on the floor with a hose going out a window. Usually only cools one room.<br><br>
             <strong>Radiant / baseboard:</strong> Heat comes from the floor, from cast-iron radiators, or from electric baseboard heaters along the walls. No air blowing at all.
@@ -1200,23 +1200,23 @@
           <span class="priority-badge">Very helpful</span>
           Approximate home size
         </label>
-        <div class="field-hint">Not sure? Count the rooms — see the guide below.</div>
+        <div class="field-hint">Not sure? Count the rooms - see the guide below.</div>
         <select id="sqft" onchange="markFilled(this)">
           <option value="">Not sure</option>
-          <option value="under 800 sq ft">Small — under 800 sq ft</option>
-          <option value="800–1200 sq ft">Medium-small — 800 to 1,200 sq ft</option>
-          <option value="1200–1800 sq ft">Medium — 1,200 to 1,800 sq ft</option>
-          <option value="1800–2500 sq ft">Medium-large — 1,800 to 2,500 sq ft</option>
-          <option value="2500–3500 sq ft">Large — 2,500 to 3,500 sq ft</option>
-          <option value="over 3500 sq ft">Very large — over 3,500 sq ft</option>
+          <option value="under 800 sq ft">Small - under 800 sq ft</option>
+          <option value="800-1200 sq ft">Medium-small - 800 to 1,200 sq ft</option>
+          <option value="1200-1800 sq ft">Medium - 1,200 to 1,800 sq ft</option>
+          <option value="1800-2500 sq ft">Medium-large - 1,800 to 2,500 sq ft</option>
+          <option value="2500-3500 sq ft">Large - 2,500 to 3,500 sq ft</option>
+          <option value="over 3500 sq ft">Very large - over 3,500 sq ft</option>
         </select>
         <div class="how-to-know" onclick="toggleHow('how-sqft')">
           <span class="htk-trigger">&#63; How do I know my home size?</span>
           <div class="htk-body" id="how-sqft">
-            <strong>Easiest:</strong> Look up your address on Zillow or your county property appraiser website — square footage is listed on every home.<br><br>
+            <strong>Easiest:</strong> Look up your address on Zillow or your county property appraiser website - square footage is listed on every home.<br><br>
             <strong>From your records:</strong> Check your mortgage docs, home inspection report, or property tax bill.<br><br>
-            <strong>Quick estimate by bedrooms:</strong> 1 bed ≈ under 800. 2 bed ≈ 900–1,200. 3 bed ≈ 1,200–1,800. 4 bed ≈ 1,800–2,500. 5+ bed ≈ over 2,500.<br><br>
-            <strong>Or use the room guide</strong> below — just pick the description that sounds like your place.
+            <strong>Quick estimate by bedrooms:</strong> 1 bed ≈ under 800. 2 bed ≈ 900-1,200. 3 bed ≈ 1,200-1,800. 4 bed ≈ 1,800-2,500. 5+ bed ≈ over 2,500.<br><br>
+            <strong>Or use the room guide</strong> below - just pick the description that sounds like your place.
           </div>
         </div>
 
@@ -1235,28 +1235,28 @@
               <span style="color:var(--muted);">One main room, small kitchen, 1 bath. Fits in a hotel suite.</span></span>
             </div>
 
-            <div class="sqft-row" onclick="pickSqft('800–1200 sq ft', this)">
+            <div class="sqft-row" onclick="pickSqft('800-1200 sq ft', this)">
               <span class="sqft-dot" style="background:#7ecf6a"></span>
               <span><strong>Small house or 2-bed apartment</strong><br>
-              <span style="color:var(--muted);">2 bedrooms, 1–2 baths, small living room. Takes ~10 min to vacuum.</span></span>
+              <span style="color:var(--muted);">2 bedrooms, 1-2 baths, small living room. Takes ~10 min to vacuum.</span></span>
             </div>
 
-            <div class="sqft-row" onclick="pickSqft('1200–1800 sq ft', this)">
+            <div class="sqft-row" onclick="pickSqft('1200-1800 sq ft', this)">
               <span class="sqft-dot" style="background:#ffc107"></span>
               <span><strong>Average 3-bedroom home</strong><br>
               <span style="color:var(--muted);">3 beds, 2 baths, living room, dining room. Most common size in the US.</span></span>
             </div>
 
-            <div class="sqft-row" onclick="pickSqft('1800–2500 sq ft', this)">
+            <div class="sqft-row" onclick="pickSqft('1800-2500 sq ft', this)">
               <span class="sqft-dot" style="background:#ef9f27"></span>
-              <span><strong>Larger 3–4 bedroom home</strong><br>
-              <span style="color:var(--muted);">4 beds, 2–3 baths, maybe a bonus room or office. Feels spacious.</span></span>
+              <span><strong>Larger 3-4 bedroom home</strong><br>
+              <span style="color:var(--muted);">4 beds, 2-3 baths, maybe a bonus room or office. Feels spacious.</span></span>
             </div>
 
-            <div class="sqft-row" onclick="pickSqft('2500–3500 sq ft', this)">
+            <div class="sqft-row" onclick="pickSqft('2500-3500 sq ft', this)">
               <span class="sqft-dot" style="background:#ff6b35"></span>
-              <span><strong>Large 4–5 bedroom home</strong><br>
-              <span style="color:var(--muted);">4–5 beds, 3+ baths, formal dining, probably two stories.</span></span>
+              <span><strong>Large 4-5 bedroom home</strong><br>
+              <span style="color:var(--muted);">4-5 beds, 3+ baths, formal dining, probably two stories.</span></span>
             </div>
 
             <div class="sqft-row" onclick="pickSqft('over 3500 sq ft', this)">
@@ -1266,7 +1266,7 @@
             </div>
 
             <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border); color:var(--muted); font-size:11px;">
-              Or check your county property records, Zillow listing, or home inspection report — the exact number is usually there.
+              Or check your county property records, Zillow listing, or home inspection report - the exact number is usually there.
             </div>
           </div>
         </div>
@@ -1279,19 +1279,19 @@
         </label>
         <select id="unitAge" onchange="markFilled(this)">
           <option value="">Don't know</option>
-          <option value="brand new (under 2 years)">Brand new — under 2 years</option>
-          <option value="fairly new (2–5 years)">Fairly new — 2 to 5 years</option>
-          <option value="middle-aged (6–12 years)">Middle-aged — 6 to 12 years</option>
-          <option value="older (13–20 years)">Older — 13 to 20 years</option>
-          <option value="very old (20+ years)">Very old — over 20 years</option>
+          <option value="brand new (under 2 years)">Brand new - under 2 years</option>
+          <option value="fairly new (2-5 years)">Fairly new - 2 to 5 years</option>
+          <option value="middle-aged (6-12 years)">Middle-aged - 6 to 12 years</option>
+          <option value="older (13-20 years)">Older - 13 to 20 years</option>
+          <option value="very old (20+ years)">Very old - over 20 years</option>
         </select>
         <div class="how-to-know" onclick="toggleHow('how-age')">
           <span class="htk-trigger">&#63; How do I know?</span>
           <div class="htk-body" id="how-age">
-            <strong>Check the data plate</strong> — there's a metal or paper sticker on the side of your outdoor unit and indoor unit. Look for "MFG DATE," "Manufactured," or a serial number. Many serial numbers encode the year — e.g. if it starts with "1216" that usually means December 2016.<br><br>
-            <strong>Ask your home inspector</strong> — if you bought the home recently, the inspection report lists equipment age.<br><br>
-            <strong>Check your paperwork</strong> — warranty cards, receipts, or the previous owner's records.<br><br>
-            <strong>Look it up online</strong> — search the brand name + serial number decoder (e.g. "Carrier serial number date lookup") and you'll find the exact manufacture date.
+            <strong>Check the data plate</strong> - there's a metal or paper sticker on the side of your outdoor unit and indoor unit. Look for "MFG DATE," "Manufactured," or a serial number. Many serial numbers encode the year - e.g. if it starts with "1216" that usually means December 2016.<br><br>
+            <strong>Ask your home inspector</strong> - if you bought the home recently, the inspection report lists equipment age.<br><br>
+            <strong>Check your paperwork</strong> - warranty cards, receipts, or the previous owner's records.<br><br>
+            <strong>Look it up online</strong> - search the brand name + serial number decoder (e.g. "Carrier serial number date lookup") and you'll find the exact manufacture date.
           </div>
         </div>
       </div>
@@ -1305,9 +1305,9 @@
         <div class="how-to-know" onclick="toggleHow('how-temp')">
           <span class="htk-trigger">&#63; How do I know?</span>
           <div class="htk-body" id="how-temp">
-            <strong>Thermostat setting:</strong> The temperature you've asked the system to reach — usually the number you set it to.<br><br>
-            <strong>Actual indoor temp:</strong> What the thermostat screen currently reads as the room temperature. On most thermostats there are two numbers — a big one (what it is now) and a smaller one (what you want it to be).<br><br>
-            <strong>Example:</strong> "Set to 72, currently showing 81" — that 9-degree gap tells the AI a lot about how well the system is working.<br><br>
+            <strong>Thermostat setting:</strong> The temperature you've asked the system to reach - usually the number you set it to.<br><br>
+            <strong>Actual indoor temp:</strong> What the thermostat screen currently reads as the room temperature. On most thermostats there are two numbers - a big one (what it is now) and a smaller one (what you want it to be).<br><br>
+            <strong>Example:</strong> "Set to 72, currently showing 81" - that 9-degree gap tells the AI a lot about how well the system is working.<br><br>
             <strong>No thermostat display?</strong> Use a cheap indoor thermometer or even your phone's weather app for an indoor reading. Even a rough guess helps.
           </div>
         </div>
@@ -1367,13 +1367,13 @@
       <button class="quick-btn" onclick="quickPrompt('My AC is running but not cooling. Outside temp is 95°F. What should I check first?')">
         <span class="qb-icon">❄</span>Running but not cooling
       </button>
-      <button class="quick-btn" onclick="quickPrompt('Unit is freezing up — ice on the coil. What are the most likely causes and what order should I check them?')">
+      <button class="quick-btn" onclick="quickPrompt('Unit is freezing up - ice on the coil. What are the most likely causes and what order should I check them?')">
         <span class="qb-icon">🧊</span>Ice / freeze-up on coil
       </button>
       <button class="quick-btn" onclick="quickPrompt('Condenser fan motor is running but compressor is not starting. What do I test?')">
         <span class="qb-icon">⚡</span>Compressor not starting
       </button>
-      <button class="quick-btn" onclick="quickPrompt('Customer says unit is short-cycling — turns on and off every few minutes. Walk me through diagnosis.')">
+      <button class="quick-btn" onclick="quickPrompt('Customer says unit is short-cycling - turns on and off every few minutes. Walk me through diagnosis.')">
         <span class="qb-icon">🔄</span>Short cycling
       </button>
       <button class="quick-btn" onclick="quickPrompt('High head pressure, suction pressure normal to low. What does this pattern tell me?')">
@@ -1393,7 +1393,7 @@
       <div class="sidebar-label">What the AI sees right now</div>
 
       <div id="liveSummary" style="margin-bottom:12px;">
-        <div class="live-empty">Fill in the fields above — I'll show you what I know so far.</div>
+        <div class="live-empty">Fill in the fields above - I'll show you what I know so far.</div>
       </div>
 
       <div id="liveSuggestions" style="display:none;">
@@ -1426,11 +1426,11 @@
           <label>Location / Climate Zone</label>
           <select id="size-climate">
             <option value="">Select climate type</option>
-            <option value="hot-humid (Southeast, Gulf Coast, Florida)">Hot-humid — Southeast, Gulf Coast, FL</option>
-            <option value="hot-dry (Southwest, desert regions)">Hot-dry — Southwest, desert regions</option>
-            <option value="mixed (Mid-Atlantic, Central US)">Mixed — Mid-Atlantic, Central US</option>
-            <option value="cold (Midwest, Northeast)">Cold — Midwest, Northeast</option>
-            <option value="very cold (Upper Midwest, Mountain, Canada border)">Very cold — Upper Midwest, Mountain</option>
+            <option value="hot-humid (Southeast, Gulf Coast, Florida)">Hot-humid - Southeast, Gulf Coast, FL</option>
+            <option value="hot-dry (Southwest, desert regions)">Hot-dry - Southwest, desert regions</option>
+            <option value="mixed (Mid-Atlantic, Central US)">Mixed - Mid-Atlantic, Central US</option>
+            <option value="cold (Midwest, Northeast)">Cold - Midwest, Northeast</option>
+            <option value="very cold (Upper Midwest, Mountain, Canada border)">Very cold - Upper Midwest, Mountain</option>
           </select>
         </div>
 
@@ -1438,12 +1438,12 @@
           <label>Home Square Footage</label>
           <select id="size-sqft">
             <option value="">Not sure</option>
-            <option value="under 800 sq ft">Small — under 800 sq ft</option>
-            <option value="800–1200 sq ft">Medium-small — 800 to 1,200 sq ft</option>
-            <option value="1200–1800 sq ft">Medium — 1,200 to 1,800 sq ft</option>
-            <option value="1800–2500 sq ft">Medium-large — 1,800 to 2,500 sq ft</option>
-            <option value="2500–3500 sq ft">Large — 2,500 to 3,500 sq ft</option>
-            <option value="over 3500 sq ft">Very large — over 3,500 sq ft</option>
+            <option value="under 800 sq ft">Small - under 800 sq ft</option>
+            <option value="800-1200 sq ft">Medium-small - 800 to 1,200 sq ft</option>
+            <option value="1200-1800 sq ft">Medium - 1,200 to 1,800 sq ft</option>
+            <option value="1800-2500 sq ft">Medium-large - 1,800 to 2,500 sq ft</option>
+            <option value="2500-3500 sq ft">Large - 2,500 to 3,500 sq ft</option>
+            <option value="over 3500 sq ft">Very large - over 3,500 sq ft</option>
           </select>
         </div>
 
@@ -1461,10 +1461,10 @@
           <label>Insulation Quality</label>
           <select id="size-insulation">
             <option value="">Select</option>
-            <option value="poor insulation (older home, minimal insulation)">Poor — older home, minimal insulation</option>
+            <option value="poor insulation (older home, minimal insulation)">Poor - older home, minimal insulation</option>
             <option value="average insulation">Average</option>
             <option value="good insulation">Good</option>
-            <option value="excellent insulation (well-sealed, modern)">Excellent — well-sealed, modern</option>
+            <option value="excellent insulation (well-sealed, modern)">Excellent - well-sealed, modern</option>
           </select>
         </div>
 
@@ -1490,7 +1490,7 @@
 
         <div class="field-group">
           <label>Unusual Heat Loads</label>
-          <input type="text" id="size-loads" placeholder="e.g. server room, sunroom, workshop…" autocomplete="off">
+          <input type="text" id="size-loads" placeholder="e.g. server room, sunroom, workshop..." autocomplete="off">
         </div>
       </div>
 
@@ -1505,8 +1505,8 @@
         <button class="quick-btn" onclick="quickPrompt('How do I know if a system is oversized? What problems does it cause and how do I confirm it?')">
           <span class="qb-icon">📏</span>How do I know if it's oversized?
         </button>
-        <button class="quick-btn" onclick="quickPrompt('Mini-split vs central air — which is better for my situation? Walk me through the pros and cons.')">
-          <span class="qb-icon">⚖</span>Mini-split vs central — which is better?
+        <button class="quick-btn" onclick="quickPrompt('Mini-split vs central air - which is better for my situation? Walk me through the pros and cons.')">
+          <span class="qb-icon">⚖</span>Mini-split vs central - which is better?
         </button>
       </div>
 
@@ -1565,8 +1565,8 @@
           <select id="install-lineset">
             <option value="">Select</option>
             <option value="under 25 ft lineset">Under 25 ft</option>
-            <option value="25–50 ft lineset">25 – 50 ft</option>
-            <option value="50–75 ft lineset">50 – 75 ft</option>
+            <option value="25-50 ft lineset">25 - 50 ft</option>
+            <option value="50-75 ft lineset">50 - 75 ft</option>
             <option value="75+ ft lineset">75 ft+</option>
           </select>
         </div>
@@ -1589,7 +1589,7 @@
           <span class="qb-icon">🔧</span>Lineset sizing for a 3 ton
         </button>
         <button class="quick-btn" onclick="quickPrompt('Give me a full startup checklist for a new split system install. From electrical to refrigerant charge to final test.')">
-          <span class="qb-icon">✅</span>Startup checklist — new split system
+          <span class="qb-icon">✅</span>Startup checklist - new split system
         </button>
         <button class="quick-btn" onclick="quickPrompt('What are the most common mistakes techs make on their first mini-split install? What should I watch out for?')">
           <span class="qb-icon">⚠</span>Common mini-split install mistakes
@@ -1629,9 +1629,9 @@
           <label>Equipment Tier</label>
           <select id="est-tier">
             <option value="">Select</option>
-            <option value="budget equipment (Goodman, AirQuest, etc.)">Budget — Goodman, AirQuest, etc.</option>
-            <option value="mid-grade equipment (Rheem, Carrier, Trane base models)">Mid-grade — Rheem, Carrier, Trane base</option>
-            <option value="premium equipment (Trane XV, Carrier Infinity, Lennox XC)">Premium — Trane XV, Carrier Infinity, etc.</option>
+            <option value="budget equipment (Goodman, AirQuest, etc.)">Budget - Goodman, AirQuest, etc.</option>
+            <option value="mid-grade equipment (Rheem, Carrier, Trane base models)">Mid-grade - Rheem, Carrier, Trane base</option>
+            <option value="premium equipment (Trane XV, Carrier Infinity, Lennox XC)">Premium - Trane XV, Carrier Infinity, etc.</option>
           </select>
         </div>
 
@@ -1665,7 +1665,7 @@
           <label>Include Permits?</label>
           <select id="est-permits">
             <option value="">Select</option>
-            <option value="yes, includes permits">Yes — include permits</option>
+            <option value="yes, includes permits">Yes - include permits</option>
             <option value="no permits in this estimate">No permits</option>
           </select>
         </div>
@@ -1690,7 +1690,7 @@
           <span class="qb-icon">🔍</span>How do I price a diagnostic call?
         </button>
         <button class="quick-btn" onclick="quickPrompt('Customer got a lower quote from another company. How do I handle this conversation without just racing to the bottom on price?')">
-          <span class="qb-icon">🤝</span>Customer got a lower quote — how to handle it
+          <span class="qb-icon">🤝</span>Customer got a lower quote - how to handle it
         </button>
         <button class="quick-btn" onclick="quickPrompt('What\'s a fair hourly labor rate for an HVAC tech in my area? How do I figure out what to charge?')">
           <span class="qb-icon">📊</span>What's a fair hourly labor rate?
@@ -1713,7 +1713,7 @@
         <div class="sidebar-label">What's got you frustrated?</div>
         <div class="field-group">
           <select id="vent-situation">
-            <option value="">Pick your situation…</option>
+            <option value="">Pick your situation...</option>
             <option value="a callback I can't figure out">Callback I can't figure out</option>
             <option value="a difficult or unreasonable customer">Difficult customer</option>
             <option value="a job that went sideways">Job went sideways</option>
@@ -1730,8 +1730,8 @@
 
       <div class="sidebar-section">
         <div class="sidebar-label">Quick Prompts</div>
-        <button class="quick-btn" onclick="quickPrompt('Customer called back — same issue, different excuse. I fixed it right the first time. How do I handle this callback professionally?')">
-          <span class="qb-icon">📞</span>Callback — same issue, different excuse
+        <button class="quick-btn" onclick="quickPrompt('Customer called back - same issue, different excuse. I fixed it right the first time. How do I handle this callback professionally?')">
+          <span class="qb-icon">📞</span>Callback - same issue, different excuse
         </button>
         <button class="quick-btn" onclick="quickPrompt('I diagnosed the problem correctly and gave an honest quote. They went with a cheaper guy anyway. How do I deal with this?')">
           <span class="qb-icon">😤</span>Diagnosed it right, they went cheaper
@@ -1740,7 +1740,7 @@
           <span class="qb-icon">📋</span>Dispatcher promised something I can't deliver
         </button>
         <button class="quick-btn" onclick="quickPrompt('I\'ve been on this roof for 3 hours and still can\'t figure out what\'s wrong. The system is acting bizarre. Help me think through this systematically.')">
-          <span class="qb-icon">🏠</span>3 hours on this roof — still stuck
+          <span class="qb-icon">🏠</span>3 hours on this roof - still stuck
         </button>
       </div>
 
@@ -1757,7 +1757,7 @@
         <div class="sidebar-label">Application</div>
         <div class="field-group">
           <select id="refrig-apptype" onchange="markFilled(this)">
-            <option value="">Select application type…</option>
+            <option value="">Select application type...</option>
             <option value="walk-in cooler">Walk-in cooler</option>
             <option value="walk-in freezer">Walk-in freezer</option>
             <option value="reach-in cooler">Reach-in cooler / merchandiser</option>
@@ -1773,7 +1773,7 @@
         </div>
         <div class="field-group">
           <select id="refrig-refrigerant" onchange="handleRefrigRefrigerantChange(this)">
-            <option value="">Refrigerant type…</option>
+            <option value="">Refrigerant type...</option>
             <option value="R-404A">R-404A (most common commercial)</option>
             <option value="R-448A / R-449A">R-448A / R-449A (404A replacement)</option>
             <option value="R-22">R-22 (older equipment)</option>
@@ -1792,22 +1792,22 @@
         <div class="sidebar-label">Temperatures</div>
         <div class="field-group">
           <select id="refrig-boxtemp" onchange="markFilled(this)">
-            <option value="">Current box temp…</option>
-            <option value="above 45°F (cooler running warm)">Above 45°F — cooler running warm</option>
-            <option value="35–45°F (normal range for cooler)">35–45°F — normal cooler range</option>
-            <option value="28–35°F (borderline freezing)">28–35°F — borderline freezing</option>
-            <option value="0–28°F (normal freezer range)">0–28°F — normal freezer range</option>
-            <option value="above 0°F (freezer too warm)">Above 0°F — freezer running warm</option>
-            <option value="below -10°F (freezer over-pulling)">Below -10°F — over-pulling</option>
+            <option value="">Current box temp...</option>
+            <option value="above 45°F (cooler running warm)">Above 45°F - cooler running warm</option>
+            <option value="35-45°F (normal range for cooler)">35-45°F - normal cooler range</option>
+            <option value="28-35°F (borderline freezing)">28-35°F - borderline freezing</option>
+            <option value="0-28°F (normal freezer range)">0-28°F - normal freezer range</option>
+            <option value="above 0°F (freezer too warm)">Above 0°F - freezer running warm</option>
+            <option value="below -10°F (freezer over-pulling)">Below -10°F - over-pulling</option>
           </select>
         </div>
         <div class="field-group">
           <select id="refrig-setpoint" onchange="markFilled(this)">
-            <option value="">Thermostat setpoint…</option>
-            <option value="35°F (fresh cooler)">35°F — fresh cooler</option>
-            <option value="38°F (standard cooler)">38°F — standard cooler</option>
-            <option value="0°F (standard freezer)">0°F — standard freezer</option>
-            <option value="-10°F (deep freeze)">-10°F — deep freeze</option>
+            <option value="">Thermostat setpoint...</option>
+            <option value="35°F (fresh cooler)">35°F - fresh cooler</option>
+            <option value="38°F (standard cooler)">38°F - standard cooler</option>
+            <option value="0°F (standard freezer)">0°F - standard freezer</option>
+            <option value="-10°F (deep freeze)">-10°F - deep freeze</option>
             <option value="custom / unknown">Custom or unknown</option>
           </select>
         </div>
@@ -1817,7 +1817,7 @@
         <div class="sidebar-label">System Details</div>
         <div class="field-group">
           <select id="refrig-compressor" onchange="markFilled(this)">
-            <option value="">Compressor status…</option>
+            <option value="">Compressor status...</option>
             <option value="running continuously">Running continuously</option>
             <option value="short cycling (kicks on and off rapidly)">Short cycling</option>
             <option value="not running at all">Not running at all</option>
@@ -1828,7 +1828,7 @@
         </div>
         <div class="field-group">
           <select id="refrig-defrost" onchange="markFilled(this)">
-            <option value="">Defrost type…</option>
+            <option value="">Defrost type...</option>
             <option value="electric defrost">Electric defrost</option>
             <option value="hot gas defrost">Hot gas defrost</option>
             <option value="off-cycle / natural defrost">Off-cycle / natural</option>
@@ -1838,9 +1838,9 @@
         </div>
         <div class="field-group">
           <select id="refrig-evap" onchange="markFilled(this)">
-            <option value="">Evaporator coil condition…</option>
-            <option value="clear — good airflow">Clear — good airflow</option>
-            <option value="frosted over partially">Frosted over — partial</option>
+            <option value="">Evaporator coil condition...</option>
+            <option value="clear - good airflow">Clear - good airflow</option>
+            <option value="frosted over partially">Frosted over - partial</option>
             <option value="frosted solid / blocked">Frosted solid / blocked</option>
             <option value="iced up completely">Iced up completely</option>
             <option value="dirty / restricted">Dirty / restricted</option>
@@ -1848,10 +1848,10 @@
         </div>
         <div class="field-group">
           <select id="refrig-unitage" onchange="markFilled(this)">
-            <option value="">Unit age…</option>
+            <option value="">Unit age...</option>
             <option value="under 3 years">Under 3 years</option>
-            <option value="3–7 years">3–7 years</option>
-            <option value="8–15 years">8–15 years</option>
+            <option value="3-7 years">3-7 years</option>
+            <option value="8-15 years">8-15 years</option>
             <option value="15+ years">15+ years</option>
           </select>
         </div>
@@ -1869,7 +1869,7 @@
           <span class="qb-icon">⚡</span>Compressor short cycling
         </button>
         <button class="quick-btn" onclick="quickPrompt('The condensing unit is running but the box temp keeps rising. High side pressure looks high. What should I check?')">
-          <span class="qb-icon">🔥</span>High head pressure — rising box temp
+          <span class="qb-icon">🔥</span>High head pressure - rising box temp
         </button>
         <button class="quick-btn" onclick="quickPrompt('Ice machine is not making ice. The compressor is running but no ice dropping. Walk me through a systematic diagnosis.')">
           <span class="qb-icon">🏭</span>Ice machine not making ice
@@ -1891,7 +1891,7 @@
       <div style="font-family:var(--display); font-size:11px; font-weight:600; color:var(--muted); white-space:nowrap; flex-shrink:0;">FRUSTRATION</div>
       <input type="range" id="frustration" min="1" max="10" value="5" oninput="updateFrustration(this.value)" style="flex:1; min-width:80px;">
       <div class="fr-score" id="frValue" style="font-size:18px; min-width:40px; text-align:right;">5<span class="fr-denom" style="font-size:11px;">/10</span></div>
-      <div class="fr-sublabel" id="frLabel" style="font-size:11px; color:var(--muted); font-style:italic; white-space:nowrap; max-width:220px; overflow:hidden; text-overflow:ellipsis;">Frustrated — this needs to get fixed today</div>
+      <div class="fr-sublabel" id="frLabel" style="font-size:11px; color:var(--muted); font-style:italic; white-space:nowrap; max-width:220px; overflow:hidden; text-overflow:ellipsis;">Frustrated - this needs to get fixed today</div>
     </div>
     <div class="messages" id="messages">
       <div class="welcome" id="welcome">
@@ -1908,7 +1908,7 @@
             <div class="wc-title">Size a system</div>
             <div class="wc-desc">Get a load estimate and equipment recommendation for a new install</div>
           </div>
-          <div class="welcome-card" onclick="quickPrompt('I need to estimate a full split system replacement — 3 ton, including removal of old equipment, new linesets, and startup. What should I charge?')">
+          <div class="welcome-card" onclick="quickPrompt('I need to estimate a full split system replacement - 3 ton, including removal of old equipment, new linesets, and startup. What should I charge?')">
             <div class="wc-icon">💰</div>
             <div class="wc-title">Estimate a job</div>
             <div class="wc-desc">Get pricing guidance for equipment, labor, and materials</div>
@@ -1933,7 +1933,7 @@
           <button class="send-btn" id="sendBtn" onclick="sendMessage()">&#10148;</button>
         </div>
       </div>
-      <div class="input-hint">Enter to send &nbsp;·&nbsp; Shift+Enter for new line &nbsp;·&nbsp; Beta — free to use</div>
+      <div class="input-hint">Enter to send &nbsp;·&nbsp; Shift+Enter for new line &nbsp;·&nbsp; Beta - free to use</div>
     </div>
   </div>
 </div>
@@ -1988,7 +1988,7 @@ async function doSignIn() {
   document.getElementById('signinSuccess').style.display = 'none';
   if (!email || !password) { showAuthError('signinError', 'Please enter your email and password.'); return; }
   const btn = document.getElementById('signinBtn');
-  btn.disabled = true; btn.textContent = 'Signing in…';
+  btn.disabled = true; btn.textContent = 'Signing in...';
   const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
   btn.disabled = false; btn.textContent = 'SIGN IN →';
   if (error) { showAuthError('signinError', error.message); return; }
@@ -2005,7 +2005,7 @@ async function doSignUp() {
   if (password.length < 8) { showAuthError('signupError', 'Password must be at least 8 characters.'); return; }
   if (password !== password2) { showAuthError('signupError', 'Passwords don\'t match.'); return; }
   const btn = document.getElementById('signupBtn');
-  btn.disabled = true; btn.textContent = 'Creating account…';
+  btn.disabled = true; btn.textContent = 'Creating account...';
   const { data, error } = await sbClient.auth.signUp({ email, password });
   btn.disabled = false; btn.textContent = 'CREATE ACCOUNT →';
   if (error) { showAuthError('signupError', error.message); return; }
@@ -2037,7 +2037,7 @@ function onAuthSuccess(user, session) {
   }
   document.getElementById('authBackdrop').style.display = 'none';
   // Show user in header
-  const display = user.email.split('@')[0] + '@…';
+  const display = user.email.split('@')[0] + '@...';
   document.getElementById('userEmailDisplay').textContent = display;
   document.getElementById('authHeaderArea').style.display = 'flex';
   loadUsageInfo();
@@ -2102,7 +2102,7 @@ DIAGNOSTIC APPROACH:
 - Always mention safety warnings when relevant (refrigerant handling, electrical hazards)
 - When giving steps, number them and put the cheapest/easiest checks first
 
-FORMATTING: Use clear sections. Bold the most likely cause. Use bullet points for check lists. Keep it practical — this person may be on a rooftop in 100 degree heat reading this on their phone.
+FORMATTING: Use clear sections. Bold the most likely cause. Use bullet points for check lists. Keep it practical - this person may be on a rooftop in 100 degree heat reading this on their phone.
 
 SYSTEM CONTEXT (if provided by user): Use the system type, refrigerant, square footage, and unit age from the sidebar to inform your answers.
 
@@ -2126,32 +2126,32 @@ Be practical. An experienced installer knows that Manual J is a starting point, 
 
 Cover: lineset sizing and routing, electrical requirements, pad and mounting, refrigerant line insulation, startup procedures, filter drier, thermostat wiring, commissioning checks, and common installation mistakes.
 
-Be specific. Don't just say "follow manufacturer instructions" — give the real-world guidance that experienced techs know.`,
+Be specific. Don't just say "follow manufacturer instructions" - give the real-world guidance that experienced techs know.`,
 
-  estimate: `You are FieldMind, an HVAC job estimating assistant. Help techs and contractors price jobs fairly — not so high they lose the bid, not so low they lose money.
+  estimate: `You are FieldMind, an HVAC job estimating assistant. Help techs and contractors price jobs fairly - not so high they lose the bid, not so low they lose money.
 
-For estimates, consider: equipment cost (ask brand tier preference — budget/mid/premium), labor hours for the job type, materials (linesets, disconnect, pad, whip, thermostat, filter drier), permit if applicable, and regional labor rates.
+For estimates, consider: equipment cost (ask brand tier preference - budget/mid/premium), labor hours for the job type, materials (linesets, disconnect, pad, whip, thermostat, filter drier), permit if applicable, and regional labor rates.
 
-Give a realistic range and explain what drives the high vs low end. Flag anything that commonly causes jobs to go over budget. Also help with presenting pricing to customers — how to explain value, handle price shoppers, and avoid race-to-the-bottom situations.`,
+Give a realistic range and explain what drives the high vs low end. Flag anything that commonly causes jobs to go over budget. Also help with presenting pricing to customers - how to explain value, handle price shoppers, and avoid race-to-the-bottom situations.`,
 
   refrig: `You are FieldMind, an AI commercial refrigeration diagnostic assistant built on real-world field experience servicing walk-in coolers, walk-in freezers, reach-in cases, display cases, ice machines, and commercial condensing units.
 
 Your role is to help refrigeration technicians diagnose and fix problems quickly and accurately.
 
-PERSONALITY: You think like an experienced refrigeration tech — direct, systematic, practical. You say things like "first thing I'd check is the defrost termination thermostat" and "nine times out of ten when I see iced-over coils with the defrost running, it's the heater element or the limit stat."
+PERSONALITY: You think like an experienced refrigeration tech - direct, systematic, practical. You say things like "first thing I'd check is the defrost termination thermostat" and "nine times out of ten when I see iced-over coils with the defrost running, it's the heater element or the limit stat."
 
 DIAGNOSTIC APPROACH:
 - Think application first: walk-in cooler vs. freezer vs. ice machine have very different failure patterns
-- Defrost system faults are the #1 cause of iced coils — always check defrost clock/board, heater, termination stat, and drain
+- Defrost system faults are the #1 cause of iced coils - always check defrost clock/board, heater, termination stat, and drain
 - High head pressure → condenser issues (dirty coils, failed fan motor, high ambient, overcharge)
 - Low suction → low charge, restriction, or TXV/cap tube issue
 - Short cycling → low pressure cutout, overload, or controls issue
 - Ice machines: separate water circuit faults from refrigeration circuit faults
-- Always ask if the condensing unit is remote or self-contained — changes the whole picture
+- Always ask if the condensing unit is remote or self-contained - changes the whole picture
 - Safety warnings: EPA Section 608 refrigerant handling, high-voltage defrost heaters, CO2 system pressures
 - Put cheapest and easiest checks first; don't send someone for parts before verifying the simple stuff
 
-FORMATTING: Clear numbered steps. Bold the most likely cause. Keep it practical — someone may be standing in a 35°F walk-in at 2 AM reading this on their phone.
+FORMATTING: Clear numbered steps. Bold the most likely cause. Keep it practical - someone may be standing in a 35°F walk-in at 2 AM reading this on their phone.
 
 When diagnosing, structure your response:
 1. Most likely cause (and why, based on the symptoms)
@@ -2161,9 +2161,9 @@ When diagnosing, structure your response:
 
 Never make up part numbers. If you don't know a specific brand's quirk, say so.`,
 
-  vent: `You are FieldMind, and right now you're just a fellow experienced tech who gets it. The user needs to vent about something frustrating — a difficult customer, a callback they can't figure out, a job that went sideways, or just the general stress of the trade.
+  vent: `You are FieldMind, and right now you're just a fellow experienced tech who gets it. The user needs to vent about something frustrating - a difficult customer, a callback they can't figure out, a job that went sideways, or just the general stress of the trade.
 
-Listen first. Acknowledge the frustration genuinely — don't immediately jump to solutions. Say things like "yeah, that's brutal" or "I've been in that exact situation." Then, once they feel heard, help them think through it clearly.
+Listen first. Acknowledge the frustration genuinely - don't immediately jump to solutions. Say things like "yeah, that's brutal" or "I've been in that exact situation." Then, once they feel heard, help them think through it clearly.
 
 You understand: difficult customers who don't trust techs, callbacks that make you question your own work, jobs that look simple but turn into nightmares, dispatchers who oversell timelines, heat exhaustion and physical toll of the job, customers who got a cheaper quote after you diagnosed the problem.
 
@@ -2280,7 +2280,7 @@ function clearChat() {
         <div class="wc-title">Iced-over coil</div>
         <div class="wc-desc">Defrost failure / restricted airflow</div>
       </div>
-      <div class="welcome-card" onclick="quickPrompt('The compressor is short cycling — runs about 2 minutes then kicks off. Happens every few minutes.')">
+      <div class="welcome-card" onclick="quickPrompt('The compressor is short cycling - runs about 2 minutes then kicks off. Happens every few minutes.')">
         <div class="wc-icon">⚡</div>
         <div class="wc-title">Short cycling</div>
         <div class="wc-desc">Compressor keeps kicking on and off</div>
@@ -2315,15 +2315,15 @@ function clearChat() {
 }
 
 const FR_DATA = {
-  1:  { emoji: '😌', label: 'Just curious — no rush at all',                  cls: 'fr-low',  color: '#00c896' },
+  1:  { emoji: '😌', label: 'Just curious - no rush at all',                  cls: 'fr-low',  color: '#00c896' },
   2:  { emoji: '🙂', label: 'Minor issue, no big deal yet',                   cls: 'fr-low',  color: '#00c896' },
   3:  { emoji: '🤔', label: 'Something feels off, want to figure it out',     cls: 'fr-low',  color: '#7ecf6a' },
   4:  { emoji: '😐', label: 'Getting a little annoying now',                  cls: 'fr-mid',  color: '#ffc107' },
-  5:  { emoji: '😑', label: 'Frustrated — this needs to get fixed today',     cls: 'fr-mid',  color: '#ffc107' },
-  6:  { emoji: '😤', label: 'Really frustrated — been dealing with this',     cls: 'fr-mid',  color: '#ef9f27' },
-  7:  { emoji: '😠', label: "Angry — it's hot/cold and nothing is working",   cls: 'fr-high', color: '#ff6b35' },
-  8:  { emoji: '🤬', label: 'Furious — callbacks, wasted time, losing money', cls: 'fr-high', color: '#ff6b35' },
-  9:  { emoji: '🔥', label: 'At my limit — need an answer RIGHT NOW',         cls: 'fr-max',  color: '#e24b4a' },
+  5:  { emoji: '😑', label: 'Frustrated - this needs to get fixed today',     cls: 'fr-mid',  color: '#ffc107' },
+  6:  { emoji: '😤', label: 'Really frustrated - been dealing with this',     cls: 'fr-mid',  color: '#ef9f27' },
+  7:  { emoji: '😠', label: "Angry - it's hot/cold and nothing is working",   cls: 'fr-high', color: '#ff6b35' },
+  8:  { emoji: '🤬', label: 'Furious - callbacks, wasted time, losing money', cls: 'fr-high', color: '#ff6b35' },
+  9:  { emoji: '🔥', label: 'At my limit - need an answer RIGHT NOW',         cls: 'fr-max',  color: '#e24b4a' },
   10: { emoji: '💀', label: "DONE. Fix this or I'm calling someone else.",    cls: 'fr-max',  color: '#e24b4a' },
 };
 
@@ -2432,17 +2432,17 @@ function updateLivePanel() {
 
   // Build what-we-know items
   let items = [];
-  let score = 0; // confidence 0–100
+  let score = 0; // confidence 0-100
 
   // Frustration always known
-  items.push({ icon: frData.emoji, label: 'Frustration level', text: `${frVal}/10 — ${frData.label}` });
+  items.push({ icon: frData.emoji, label: 'Frustration level', text: `${frVal}/10 - ${frData.label}` });
   score += 15;
 
   if (detected) {
     items.push({ icon: '🏠', label: 'System type (detected)', text: detected });
     score += 30;
   } else if (outdoor || heat || air) {
-    items.push({ icon: '🔍', label: 'System type', text: 'Still figuring out — answer more fields above' });
+    items.push({ icon: '🔍', label: 'System type', text: 'Still figuring out - answer more fields above' });
     score += 5;
   }
 
@@ -2458,7 +2458,7 @@ function updateLivePanel() {
 
   // Render items
   if (items.length === 1) {
-    summary.innerHTML = "<div class='live-empty'>Fill in the fields above — I'll show you what I know so far.</div>";
+    summary.innerHTML = "<div class='live-empty'>Fill in the fields above - I'll show you what I know so far.</div>";
   } else {
     summary.innerHTML = items.map(i => `
       <div class="live-item">
@@ -2471,7 +2471,7 @@ function updateLivePanel() {
   let suggestions = [];
 
   if (!outdoor && !detected) {
-    suggestions.push({ cls: 'si-warn', text: "Step outside — does your home have an outdoor unit? This is the most important question." });
+    suggestions.push({ cls: 'si-warn', text: "Step outside - does your home have an outdoor unit? This is the most important question." });
   }
   if (!heat && outdoor) {
     suggestions.push({ cls: 'si-warn', text: "How does your home get heated? This helps identify your exact system type." });
@@ -2483,16 +2483,16 @@ function updateLivePanel() {
     suggestions.push({ cls: 'si-tip', text: "Adding a rough home size helps the AI recommend the right equipment tonnage." });
   }
   if (!age && detected) {
-    suggestions.push({ cls: 'si-tip', text: "System age is helpful — older units (12+ years) have very different failure patterns." });
+    suggestions.push({ cls: 'si-tip', text: "System age is helpful - older units (12+ years) have very different failure patterns." });
   }
   if (!tempDelta && detected && frVal >= 5) {
     suggestions.push({ cls: 'si-tip', text: "What does your thermostat say vs. what is the actual indoor temp? Big clue for diagnosis." });
   }
   if (frVal >= 8 && suggestions.length === 0) {
-    suggestions.push({ cls: 'si-tip', text: "You're ready — just describe the problem in the chat and I'll get straight to the point." });
+    suggestions.push({ cls: 'si-tip', text: "You're ready - just describe the problem in the chat and I'll get straight to the point." });
   }
   if (suggestions.length === 0 && score >= 80) {
-    suggestions.push({ cls: 'si-tip', text: "You're all set — the AI has enough context. Just describe what's happening." });
+    suggestions.push({ cls: 'si-tip', text: "You're all set - the AI has enough context. Just describe what's happening." });
   }
 
   if (suggestions.length > 0) {
@@ -2579,8 +2579,8 @@ function detectSystem() { updateLivePanel();
   else if (air === 'radiant') detected = 'Boiler / radiant heat system (no forced air)';
   else if (air === 'mini') detected = 'Mini-split / ductless system';
   else if (outdoor === 'yes' && heat === 'heatpump') detected = 'Heat pump (provides both heating and cooling)';
-  else if (outdoor === 'yes' && heat === 'gas') detected = 'Split system — gas furnace + central AC';
-  else if (outdoor === 'yes' && heat === 'electric_strip') detected = 'Split system — electric air handler + central AC';
+  else if (outdoor === 'yes' && heat === 'gas') detected = 'Split system - gas furnace + central AC';
+  else if (outdoor === 'yes' && heat === 'electric_strip') detected = 'Split system - electric air handler + central AC';
   else if (outdoor === 'no' && heat === 'boiler') detected = 'Boiler / radiant heat (no AC or separate)';
   else if (outdoor === 'yes' && air === 'ducts') detected = 'Central split system (AC + heating)';
   else if (outdoor === 'no' && air === 'ducts') detected = 'Likely gas furnace or electric air handler only';
@@ -2593,8 +2593,8 @@ function detectSystem() { updateLivePanel();
 function getSystemContext() {
   const frVal = document.getElementById('frustration').value;
   const frLabel = document.getElementById('frLabel').textContent;
-  const frCtx = `User frustration level: ${frVal}/10 — "${frLabel}". `;
-  const toneTip = `[System context — do NOT ask user to repeat this info, use it silently. IMPORTANT: adjust your tone based on the frustration level. Level 1-3: calm and educational. Level 4-6: efficient and direct, skip the fluff. Level 7-8: get straight to the point, acknowledge their frustration briefly first. Level 9-10: lead with empathy, one sentence max, then immediate action steps — no lengthy explanations. `;
+  const frCtx = `User frustration level: ${frVal}/10 - "${frLabel}". `;
+  const toneTip = `[System context - do NOT ask user to repeat this info, use it silently. IMPORTANT: adjust your tone based on the frustration level. Level 1-3: calm and educational. Level 4-6: efficient and direct, skip the fluff. Level 7-8: get straight to the point, acknowledge their frustration briefly first. Level 9-10: lead with empathy, one sentence max, then immediate action steps - no lengthy explanations. `;
 
   if (currentMode === 'vent') {
     // For frustrations mode, just pass situation if selected
@@ -2885,7 +2885,7 @@ async function loadTeamData() {
 
 async function showTeamDashboard() {
   document.getElementById('teamBackdrop').style.display = 'flex';
-  document.getElementById('teamSeatsBar').textContent = 'Loading…';
+  document.getElementById('teamSeatsBar').textContent = 'Loading...';
   document.getElementById('teamMemberList').innerHTML = '';
   const team = await loadTeamData();
   if (!team) {
@@ -3046,7 +3046,7 @@ function toggleAnnual() {
 
 async function goToPro() {
   const btn = document.getElementById('upgradeBtn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Loading…'; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Loading...'; }
   try {
     const chatToken = currentSession ? currentSession.access_token : '';
     const priceId = PRICE_IDS[selectedPlan] || PRICE_IDS['pro_month'];
@@ -3081,7 +3081,7 @@ function detectProContent(text) {
     /\b\d+\s*(psi|psig)\b/i,
     /\b(suction|head pressure|high side|low side|discharge pressure)\b/i,
     /\b(superheat|subcooling|sub-cooling|sub\s+cooling)\b/i,
-    /\b(microfarad|µF|uf|capacitor reading|compressor amps|amp draw|RLA|LRA|megohm|meg\s+ohm)\b/i,
+    /\b(microfarad|μF|uf|capacitor reading|compressor amps|amp draw|RLA|LRA|megohm|meg\s+ohm)\b/i,
     /\b(manifold|gauges|gauge reading)\b/i
   ];
   return patterns.some(p => p.test(text));
@@ -3225,7 +3225,7 @@ async function sendMessage() {
 <div id="authBackdrop" class="auth-backdrop">
   <div class="auth-modal">
     <div class="auth-logo"><span class="logo-dot"></span>FieldMind</div>
-    <div class="auth-tagline">AI-powered HVAC diagnostics. Sign in to get started — free during beta.</div>
+    <div class="auth-tagline">AI-powered HVAC/R diagnostics. Sign in to get started — free during beta.</div>
     <div class="auth-tabs">
       <button class="auth-tab active" id="tabSignIn" onclick="switchAuthTab('signin')">SIGN IN</button>
       <button class="auth-tab" id="tabSignUp" onclick="switchAuthTab('signup')">CREATE ACCOUNT</button>
@@ -3370,7 +3370,7 @@ async function sendMessage() {
 
     <!-- Seats summary -->
     <div id="teamSeatsBar" style="background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:16px; margin-bottom:20px; font-size:14px;">
-      Loading…
+      Loading...
     </div>
 
     <!-- Member list -->
