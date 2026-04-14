@@ -2187,11 +2187,24 @@ function handleImageUpload(input) {
     if (!file.type.startsWith('image/')) return;
     const reader = new FileReader();
     reader.onload = (e) => {
-      const dataUrl = e.target.result;
-      const base64 = dataUrl.split(',')[1];
-      const mediaType = file.type;
-      pendingImages.push({ base64, mediaType, previewUrl: dataUrl, name: file.name });
-      renderImagePreviews();
+      const img = new Image();
+      img.onload = () => {
+        // Resize to max 1024px on longest side to stay well under Netlify's 6MB limit
+        const MAX = 1024;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        const resizedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        const base64 = resizedDataUrl.split(',')[1];
+        pendingImages.push({ base64, mediaType: 'image/jpeg', previewUrl: resizedDataUrl, name: file.name });
+        renderImagePreviews();
+      };
+      img.src = e.target.result;
     };
     reader.readAsDataURL(file);
   });
