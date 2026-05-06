@@ -1952,9 +1952,13 @@
       <div class="input-wrap">
         <textarea id="userInput" rows="1" placeholder="Describe the symptom, system, or job situation..." oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
         <div class="input-actions">
-          <button class="upload-btn" id="uploadBtn" title="Upload a photo (Pro only)" onclick="if(userPlan!=='pro'){showUpgradeModal();return false;}">
-            📷
+          <button class="upload-btn" id="uploadBtn" title="Choose from gallery (Pro only)" onclick="if(userPlan!=='pro'){showUpgradeModal();return false;}">
+            🖼️
             <input type="file" accept="image/*" multiple onchange="handleImageUpload(this)">
+          </button>
+          <button class="upload-btn" id="cameraBtn" title="Take a photo (Pro only)" onclick="if(userPlan!=='pro'){showUpgradeModal();return false;}">
+            📷
+            <input type="file" accept="image/*" capture="environment" onchange="handleImageUpload(this)">
           </button>
           <button class="mic-btn" id="micBtn" title="Voice input" onclick="toggleMic()">🎤</button>
           <button class="send-btn" id="sendBtn" onclick="sendMessage()">&#10148;</button>
