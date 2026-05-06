@@ -568,12 +568,179 @@
 
     footer nav a:hover { color: var(--text); }
 
+    /* HOW IT WORKS */
+    .hiw-steps {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 48px;
+      flex-wrap: wrap;
+    }
+
+    .hiw-step {
+      flex: 1;
+      min-width: 200px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .hiw-step-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .hiw-step h4 {
+      font-family: var(--display);
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .hiw-step p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .hiw-divider {
+      font-size: 24px;
+      color: var(--accent);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* DEMO WINDOW */
+    .demo-window {
+      margin-top: 56px;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+    }
+
+    .demo-titlebar {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .demo-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .demo-title {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      margin-left: 8px;
+    }
+
+    .demo-messages {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .demo-msg {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .demo-msg.user {
+      flex-direction: row-reverse;
+    }
+
+    .demo-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(0,212,255,0.15);
+      border: 1px solid rgba(0,212,255,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .demo-bubble {
+      max-width: 75%;
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .demo-bubble.user {
+      background: var(--accent);
+      color: #000;
+      border-bottom-right-radius: 4px;
+      font-weight: 500;
+    }
+
+    .demo-bubble.ai {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-bottom-left-radius: 4px;
+    }
+
+    .demo-input-row {
+      margin-bottom: 6px;
+    }
+
+    .demo-tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 4px;
+      padding: 2px 8px;
+    }
+
+    .demo-inputbar {
+      border-top: 1px solid var(--border);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface2);
+    }
+
+    .demo-placeholder {
+      font-size: 13px;
+      color: var(--muted);
+      font-family: var(--sans);
+    }
+
+    .demo-icons {
+      font-size: 16px;
+      color: var(--muted);
+      letter-spacing: 4px;
+    }
+
     /* RESPONSIVE */
     @media (max-width: 768px) {
       .nav-links { display: none; }
       .audience-grid { grid-template-columns: 1fr; }
       .quote-section { padding: 36px 24px; }
       footer { flex-direction: column; align-items: flex-start; }
+      .hiw-divider { display: none; }
+      .demo-bubble { max-width: 90%; }
     }
   </style>
 </head>
@@ -678,6 +845,108 @@
       <cite>— Joe Weikel, Former HVAC Co-Owner & Creator of FieldMind</cite>
     </div>
   </div>
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works">
+    <div class="section-label">// How It Works</div>
+    <h2 class="section-title">Answers in seconds.<br />Not phone calls.</h2>
+    <p class="section-subtitle">Snap a photo or say it out loud — FieldMind responds like a senior tech who's seen it all.</p>
+
+    <div class="hiw-steps">
+      <div class="hiw-step">
+        <div class="hiw-step-icon">📷</div>
+        <div>
+          <h4>Take a photo</h4>
+          <p>Snap the unit, the fault code, the wiring — straight from your phone without leaving the app.</p>
+        </div>
+      </div>
+      <div class="hiw-divider">→</div>
+      <div class="hiw-step">
+        <div class="hiw-step-icon">🎤</div>
+        <div>
+          <h4>Or just say it</h4>
+          <p>Hit the mic and describe what you're seeing. No typing while your hands are dirty.</p>
+        </div>
+      </div>
+      <div class="hiw-divider">→</div>
+      <div class="hiw-step">
+        <div class="hiw-step-icon">⚡</div>
+        <div>
+          <h4>Get a real answer</h4>
+          <p>Not a generic FAQ. A step-by-step diagnostic path based on your exact situation.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mock conversation -->
+    <div class="demo-window">
+      <div class="demo-titlebar">
+        <span class="demo-dot" style="background:#ff5f57;"></span>
+        <span class="demo-dot" style="background:#febc2e;"></span>
+        <span class="demo-dot" style="background:#28c840;"></span>
+        <span class="demo-title">FieldMind — Diagnostics</span>
+      </div>
+      <div class="demo-messages">
+
+        <div class="demo-msg user">
+          <div class="demo-bubble user">
+            <div class="demo-input-row">
+              <span class="demo-tag">🎤 Voice</span>
+            </div>
+            Unit's running but not cooling. Outdoor fan is spinning, compressor sounds like it's humming but the suction line is barely cold. Refrigerant is 410A.
+          </div>
+        </div>
+
+        <div class="demo-msg ai">
+          <div class="demo-avatar">FM</div>
+          <div class="demo-bubble ai">
+            <p>That symptom set — compressor running, suction line barely cold — points to one of three things. Here's how to narrow it down fast:</p>
+            <br/>
+            <p><strong>1. Check your pressures first.</strong><br/>
+            On 410A you'd expect suction around 115–125 PSI and discharge around 375–400 PSI at typical load. If suction is low (under 90) and discharge is also low, you're looking at a low charge or a restriction. If suction is low but discharge is normal or high, suspect a bad compressor valve.</p>
+            <br/>
+            <p><strong>2. Feel the liquid line temperature.</strong><br/>
+            Should be warm — close to outdoor ambient. If it's cold or room temp, you've got a restriction upstream (TXV, filter drier, or king valve partially closed).</p>
+            <br/>
+            <p><strong>3. Check superheat at the suction.</strong><br/>
+            If superheat is high (over 20°F), you're either low on charge or starving the metering device. If superheat is near zero and the line is still barely cold, bad compressor is likely.</p>
+            <br/>
+            <p>What are your pressures reading?</p>
+          </div>
+        </div>
+
+        <div class="demo-msg user">
+          <div class="demo-bubble user">
+            <div class="demo-input-row">
+              <span class="demo-tag">📷 Photo</span>
+            </div>
+            Suction 78 PSI, discharge 180 PSI. [gauge photo attached]
+          </div>
+        </div>
+
+        <div class="demo-msg ai">
+          <div class="demo-avatar">FM</div>
+          <div class="demo-bubble ai">
+            <p><strong>That's a classic low charge profile.</strong> Both suction and discharge are depressed together — compressor is working but there's not enough refrigerant mass to build head pressure.</p>
+            <br/>
+            <p>Before you add refrigerant: check for an obvious leak first. With 410A systems this low, something let go. Common spots on this kind of reading:</p>
+            <br/>
+            <p>• Schrader valve cores (check both)<br/>
+            • Flare connections at the linesets<br/>
+            • Evaporator coil (especially if it's older)<br/>
+            • Service valve packing</p>
+            <br/>
+            <p>Leak check, repair, then recover/recharge to manufacturer spec. Don't just top it off.</p>
+          </div>
+        </div>
+
+      </div>
+      <div class="demo-inputbar">
+        <span class="demo-placeholder">Describe the symptom, system, or job situation...</span>
+        <span class="demo-icons">🖼️ &nbsp; 📷 &nbsp; 🎤 &nbsp; ➤</span>
+      </div>
+    </div>
+  </section>
 
   <!-- PRICING -->
   <section id="pricing" class="pricing-section">
